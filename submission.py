@@ -36,3 +36,5 @@ def six():
 def seven():
     age = int(input("Age: "))
     print(age > 18)
+
+# Joshua Bode; 14166196
