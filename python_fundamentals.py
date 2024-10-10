@@ -24,7 +24,8 @@ class Basics:#(s)
                 str: The content of the text file as a single string
         """
         #Your code here
-    
+        with open('paragraph.txt', 'r') as file:
+            return file.readline()
         pass#(s)
     
     # ---Section 2 --- #
