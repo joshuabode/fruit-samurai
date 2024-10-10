@@ -45,7 +45,7 @@ class Basics:#(s)
                 int: The length of the text string, including all characters.
         """
         #Your code here
-
+        return len(file_string)
         pass#(s)
 
     #(Task 2.2)
@@ -62,7 +62,11 @@ class Basics:#(s)
                 int: The count of lower case letters.
         """
         #Your code here
-
+        res = 0
+        for char in file_string:
+            if 96 < ord(char) < 123:        # Checks if the ASCII encoding of the number corresponds to a lowercase letter
+                res += 1
+        return res
         pass#(s)
 
     #(Task 2.3)
@@ -79,7 +83,11 @@ class Basics:#(s)
                 str: The upper case letters as a single string
         """
         #Your code here
-
+        res = ""
+        for char in file_string:
+            if 64 < ord(char) < 91:        # Checks if the ASCII encoding of the number corresponds to a UPPERCASE letter
+                res += char
+        return res
         pass#(s)
 
     #(Task 2.4)
@@ -96,7 +104,11 @@ class Basics:#(s)
                 int: The sum of all digits in the file
         """
         #Your code here
-
+        res = 0
+        for char in file_string:
+            if 47 < ord(char) < 58:        # Checks if the ASCII encoding of the number corresponds to a UPPERCASE letter
+                res += int(char)
+        return res
         pass#(s)
 
     # ---Section 3 --- #
