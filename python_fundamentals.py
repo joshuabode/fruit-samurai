@@ -130,6 +130,18 @@ class Basics:#(s)
                 bool: False if the input is invalid
         """
         #Your code here
+        with open('dictionary.txt', 'r') as file:
+            eng_dict = file.readlines()
+        words = [w for w in file_string.split(" ")]
+        count = 0
+        for w in words:
+            if w in eng_dict:
+                if count == word:
+                    return w[letter-1]
+                else:
+                    count += 1
+        return False
+
 
         pass#(s)
 
