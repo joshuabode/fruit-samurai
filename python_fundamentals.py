@@ -140,7 +140,7 @@ class Basics:#(s)
         words = [w for w in file_string.split(" ")]
         count = 0
         for w in words:
-            if w in read_dict(self):
+            if w in self.read_dict():
                 if count == word:
                     return w[letter-1]
                 else:
