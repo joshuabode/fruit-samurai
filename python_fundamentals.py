@@ -15,6 +15,12 @@ self as a parameter of the new method and  to call it with the prefix self.name
 class Basics:#(s)
     # ---Section 1 --- #
 
+    def read_dict(self):
+        with open('dictionary.txt', 'r') as file:
+            eng_dict = file.readlines()
+        return eng_dict
+        pass
+
     #(Task 1.1)
     def read_file(self):#(s)
         """
@@ -130,12 +136,11 @@ class Basics:#(s)
                 bool: False if the input is invalid
         """
         #Your code here
-        with open('dictionary.txt', 'r') as file:
-            eng_dict = file.readlines()
+
         words = [w for w in file_string.split(" ")]
         count = 0
         for w in words:
-            if w in eng_dict:
+            if w in read_dict(self):
                 if count == word:
                     return w[letter-1]
                 else:
@@ -160,7 +165,8 @@ class Basics:#(s)
                 arr[str]: A list of all words of size 'length' or longer as individual strings
         """
         #Your code here
-
+        words = [w for w in file_string.split(" ") ]
+        return [w for w in words if len(w) < length-1]
         pass#(s)
 
     #(Task 3.3)
@@ -178,7 +184,13 @@ class Basics:#(s)
                 int: The count of all letters ignoring those specified 
         """
         #Your code here
+        count = 0
 
+        for char in file_string:
+            if char.isalpha() and char not in letters:
+                count += 1
+
+        return count
         pass#(s)
 
     #(Task 3.4)
@@ -197,14 +209,26 @@ class Basics:#(s)
                 str: The contents of the text as a single string
         """
         #Your code here
-
+        indicies = []
+        old_len = len(old_substring)
+        i = file_string.find(old_substring)
+        if i != -1:
+            indicies.append(i)
+        else:
+            for index in indicies:
+                file_string = file_string[:index] + new_substring + file_string[index+old_len+1:]
+            return file_string
         pass#(s)
+
+
+
 
 
 if __name__ == '__main__':#(s)
     #You can place any ad-hoc testing here
     my_instance = Basics()
     test = my_instance.read_file()
-    print(test)
+    print(test + '\n')
+    print(my_instance.find_replace(test, "Python", "Anaconda"))
 
     pass#(s)
