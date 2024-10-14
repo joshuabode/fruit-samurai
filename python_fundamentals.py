@@ -17,9 +17,19 @@ class Basics:#(s)
 
     def read_dict(self):
         with open('dictionary.txt', 'r') as file:
-            eng_dict = file.readlines()
+            eng_dict = file.read().splitlines()
+
         return eng_dict
-        pass
+
+    def clean_words(self, str_list):
+        symbols = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', 
+                   '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~']
+        words = []
+        for w in str_list:
+            w = w.lower()
+            w = ''.join([c for c in w if c not in symbols])
+            words.append(w)
+        return words
 
     #(Task 1.1)
     def read_file(self):#(s)
@@ -136,13 +146,16 @@ class Basics:#(s)
                 bool: False if the input is invalid
         """
         #Your code here
-
-        words = [w for w in file_string.split(" ")]
+        words = [w for w in self.clean_words(file_string.split(" "))]
+        english_dict = self.read_dict()
         count = 0
         for w in words:
             if w in self.read_dict():
                 if count == word:
-                    return w[letter-1]
+                    try:
+                        return w[letter-1]
+                    except IndexError:
+                        return False
                 else:
                     count += 1
         return False
@@ -165,8 +178,14 @@ class Basics:#(s)
                 arr[str]: A list of all words of size 'length' or longer as individual strings
         """
         #Your code here
-        words = [w for w in file_string.split(" ") ]
-        return [w for w in words if len(w) < length-1]
+        english_dict = self.read_dict()
+        original_words = [w for w in file_string.split(" ") if w in english_dict]
+        clean_words = [w for w in self.clean_words(original_words)]
+        result = []
+        for i, w in enumerate(clean_words):
+            if len(w) > length-1:
+                result.append(original_words[i])
+        return result
         pass#(s)
 
     #(Task 3.3)
@@ -185,7 +204,8 @@ class Basics:#(s)
         """
         #Your code here
         count = 0
-
+        file_string = file_string.lower()
+        letters = [l.lower() for l in letters]
         for char in file_string:
             if char.isalpha() and char not in letters:
                 count += 1
@@ -211,7 +231,6 @@ class Basics:#(s)
         #Your code here
         old_len = len(old_substring)
         i = file_string.find(old_substring)
-        print(i)
         while True:
             if i != -1:
                 file_string = file_string[:i] + new_substring + file_string[i+old_len:]
@@ -222,18 +241,22 @@ class Basics:#(s)
         pass#(s)
 
 
-
-
-
 if __name__ == '__main__':#(s)
-    #You can place any ad-hoc testing here
-    my_instance = Basics()
 
-    # Task 1.1 ✅
-    test = my_instance.read_file()
-    print(test + '\n')
-
-    # Task 3.4 ✅
-    print(my_instance.find_replace(test, "Python", "Anaconda"))
+    # Testing Wikipedia's featured article's first paragraph
+    test_a = Basics()
+    a_string = test_a.read_file() 
+    print(a_string)                                                         # Self-Test: ✅
+    print(test_a.length_of_file(a_string))                                  # Self-Test: ✅
+    print(test_a.lower_case_count(a_string))                                # Self-Test: ✅
+    print(test_a.upper_case_merge(a_string))                                # Self-Test: ✅
+    print(test_a.digits_sum(a_string))                                      # Self-Test: ✅
+    print(test_a.specific_character(a_string, 11, 3))                       # Self-Test: ✅      
+    print(test_a.word_display(a_string, 9))                                 # Self-Test: ✅
+    print(test_a.letter_count(a_string, ['j', 'o', 's', 'h']))              # Self-Test: ✅                
+    print(test_a.find_replace(a_string, 'He', 'THIS USED TO SAY "HE"'))     # Self-Test: ✅    
+                
+                    
+             
 
     pass#(s)
