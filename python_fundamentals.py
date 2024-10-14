@@ -209,15 +209,16 @@ class Basics:#(s)
                 str: The contents of the text as a single string
         """
         #Your code here
-        indicies = []
         old_len = len(old_substring)
         i = file_string.find(old_substring)
-        if i != -1:
-            indicies.append(i)
-        else:
-            for index in indicies:
-                file_string = file_string[:index] + new_substring + file_string[index+old_len+1:]
-            return file_string
+        print(i)
+        while True:
+            if i != -1:
+                file_string = file_string[:i] + new_substring + file_string[i+old_len:]
+                i = file_string.find(old_substring)
+            else:
+                break
+        return file_string
         pass#(s)
 
 
@@ -227,8 +228,12 @@ class Basics:#(s)
 if __name__ == '__main__':#(s)
     #You can place any ad-hoc testing here
     my_instance = Basics()
+
+    # Task 1.1 ✅
     test = my_instance.read_file()
     print(test + '\n')
+
+    # Task 3.4 ✅
     print(my_instance.find_replace(test, "Python", "Anaconda"))
 
     pass#(s)
