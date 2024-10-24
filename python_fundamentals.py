@@ -122,7 +122,7 @@ class Basics:#(s)
         #Your code here
         res = 0
         for char in file_string:
-            if 47 < ord(char) < 58:        # Checks if the ASCII encoding of the number corresponds to a UPPERCASE letter
+            if 47 < ord(char) < 58:        # Checks if the ASCII encoding of the number corresponds to a digit
                 res += int(char)
         return res
         pass#(s)
