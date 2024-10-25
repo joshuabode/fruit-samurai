@@ -148,17 +148,12 @@ class Basics:#(s)
         #Your code here
         words = [w for w in self.clean_words(file_string.split(" "))]
         english_dict = self.read_dict()
-        count = 0
-        for w in words:
-            if w in self.read_dict():
-                if count == word:
-                    try:
-                        return w[letter-1]
-                    except IndexError:
-                        return False
-                else:
-                    count += 1
-        return False
+        words = [w for w in words if w in english_dict]
+        print(words)
+        try:
+        	return words[word-1][letter-1]
+        except IndexError:
+        	return False
 
 
         pass#(s)
@@ -179,13 +174,19 @@ class Basics:#(s)
         """
         #Your code here
         english_dict = self.read_dict()
-        original_words = [w for w in file_string.split(" ") if w in english_dict]
-        clean_words = [w for w in self.clean_words(original_words)]
-        result = []
-        for i, w in enumerate(clean_words):
-            if len(w) > length-1:
-                result.append(original_words[i])
-        return result
+        original_words = [w for w in file_string.split(" ")]
+        clean_indicies = []
+        res = []
+        for i, w in enumerate(original_words):
+        	if self.clean_words([w])[0] in english_dict:
+        		clean_indicies.append(i)
+   
+        for i in clean_indicies:
+        	if len(self.clean_words([original_words[i]])[0]) >= length:
+        		res.append(original_words[i])
+        		
+        return res
+       
         pass#(s)
 
     #(Task 3.3)
@@ -246,12 +247,9 @@ if __name__ == '__main__':#(s)
     # Testing Wikipedia's featured article's first paragraph
     test_a = Basics()
     a_string = test_a.read_file() 
-    print(a_string)                                                         # Self-Test: ✅
-    print(test_a.length_of_file(a_string))                                  # Self-Test: ✅
-    print(test_a.lower_case_count(a_string))                                # Self-Test: ✅
-    print(test_a.upper_case_merge(a_string))                                # Self-Test: ✅
-    print(test_a.digits_sum(a_string))                                      # Self-Test: ✅
-    print(test_a.specific_character(a_string, 11, 3))                       # Self-Test: ✅      
+    print(test_a.clean_words("Determine and return the character which is found as the n'th letter within the m'th word of the paragraph (n & m given as parameter). Display words but only those words of length n or longer".split(" ")))
+    print(test_a.read_dict()[:10])
+    
     print(test_a.word_display(a_string, 9))                                 # Self-Test: ✅
     print(test_a.letter_count(a_string, ['j', 'o', 's', 'h']))              # Self-Test: ✅                
     print(test_a.find_replace(a_string, 'He', 'THIS USED TO SAY "HE"'))     # Self-Test: ✅    
