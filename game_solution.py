@@ -25,7 +25,7 @@ class Game(Canvas):
                         (randint(fruit_size, width-fruit_size), height-fruit_size),
                         (randint(-10, 10)*ppm, randint(-10, -5)*ppm),
                         self)
-        self.fruits.append(fruit)
+        self.tag_bind(fruit.object, "<Enter>", fruit.delete)
         self.after(500, self.new_fruit)
 
 class Fruit:
@@ -40,6 +40,11 @@ class Fruit:
         self.bbox = self.canvas.bbox(self.object)
         self.deleted = False
         self.tick()
+
+    def delete(self, event):
+        self.deleted = True
+        print(self.object)
+        self.canvas.delete(self.object)
     
     def displace(self):
         left, top, right, bottom = self.bbox
