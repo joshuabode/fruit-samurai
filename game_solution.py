@@ -23,7 +23,7 @@ class App():
         root.mainloop()
 
     def new_game(self):
-        #self.menu.close_window
+        self.menu.destroy()
         game_window = Tk()
         game_window.title("Fruit Samurai")
         game_window.resizable(False, False)
@@ -62,9 +62,9 @@ class Game(Canvas):
         self.score = 0
         self.streak = 0
         self.font = ("TkDefaultFont", 20, 'bold')
-        self.lv_content = StringVar(value=f"Lives: {self.lives}")
-        self.sc_content = StringVar(value=f"Score: {self.score}")
-        self.st_content = StringVar(value=f"Streak: {self.streak}")
+        self.lv_content = StringVar(master=self.window, value=f"Lives: {self.lives}")
+        self.sc_content = StringVar(master=self.window, value=f"Score: {self.score}")
+        self.st_content = StringVar(master=self.window, value=f"Streak: {self.streak}")
         self.lives_text = self.create_label(self.lv_content, 10, 10, 'nw')         
         self.score_text = self.create_label(self.sc_content, self.width/2, 10, 'n')
         self.streak_text = self.create_label(self.st_content, self.width - 10, 10, 'ne')
@@ -78,7 +78,7 @@ class Game(Canvas):
         self.bind("<Motion>", self.mouse_velocity)
 
     def create_label(self, text, x, y, anchor):
-        label = Label(self, text=text, font=self.font)
+        label = Label(self.window, text=text, font=self.font)
         self.object = self.create_window(x, y, anchor=anchor, window=label)
         return label
 
@@ -144,7 +144,7 @@ class Fruit:
                                         Image.Resampling.NEAREST)
         if flip_image:
             self.sprite = self.sprite.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
-        self.image = ImageTk.PhotoImage(self.sprite)
+        self.image = ImageTk.PhotoImage(master=self.canvas, image=self.sprite)
         self.object = canvas.create_image(self.x, self.y, image=self.image, anchor='center')
         self.bbox = self.canvas.bbox(self.object)
         self.deleted = False
