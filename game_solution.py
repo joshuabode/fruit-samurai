@@ -4,21 +4,43 @@ from PIL import ImageTk, Image
 from random import randint, randrange, choice
 from collections import deque
 
+
 class App():
+    # TODO: Add the initial game menu
+
     def __init__(self):
+        start_window = Tk()
+        start_window.title("Fruit Samurai")
+        self.menu = start_window
+        self.init_menu()
+
+    def init_menu(self):
+        root = self.menu
+        title = Label(root, text="Fruit Samurai", font=("TkHeadingFont", 36, 'bold'))
+        new_game = Button(root, text="New Game", command=self.new_game)
+        title.pack()
+        new_game.pack()
+        root.mainloop()
+
+    def new_game(self):
+        #self.menu.close_window
         game_window = Tk()
         game_window.title("Fruit Samurai")
         game_window.resizable(False, False)
-        self.main_game = Game(960, 540)
+        self.main_game = Game(game_window, 960, 540)
         self.main_game.new_fruit() 
-        self.main_game.grid()
+        self.main_game.pack()
+        game_window.bind("<Key>", self.main_game.pause)
+        game_window.bind("<Key>", self.main_game.boss_key)
         game_window.bind("<Key>", self.main_game.check_cheat)
-        game_window.mainloop()
         self.game_window = game_window
+        game_window.mainloop()
+
 
 class Game(Canvas):
-    def __init__(self, w, h):
-        super().__init__(width=w, height=h)
+    def __init__(self, window,  w, h):
+        self.window = window
+        super().__init__(master=window, width=w, height=h)
         self.m_x = None             # Holding previous mouse x-position
         self.m_y = None             # Holding previous mouse y-position
         self.m_vel = (None, None)   # Holding mouse velocity
@@ -46,12 +68,17 @@ class Game(Canvas):
         self.lives_text = self.create_label(self.lv_content, 10, 10, 'nw')         
         self.score_text = self.create_label(self.sc_content, self.width/2, 10, 'n')
         self.streak_text = self.create_label(self.st_content, self.width - 10, 10, 'ne')
+        self.controls = {}
+        with open('controls.txt', 'r') as file:
+            for bind in file.readlines():
+                bind = bind.split(",")
+                self.controls[bind[0]] = bind[1]
         self.update()
         # self.labels = [self.lives_text, self.score_text, self.streak_text]
         self.bind("<Motion>", self.mouse_velocity)
 
     def create_label(self, text, x, y, anchor):
-        label = ttk.Label(self, text=text, font=self.font)
+        label = Label(self, text=text, font=self.font)
         self.object = self.create_window(x, y, anchor=anchor, window=label)
         return label
 
@@ -91,6 +118,15 @@ class Game(Canvas):
         if ''.join(self.key_history) == 'halfbrick':    # "Halfbrick", (the developers of the original game) is the cheat code
             self.canvas.cheating = True
 
+    def pause(self, key):
+        if key.char == self.controls['pause']:
+            self.paused = not self.paused
+            print("PAUSE")
+
+    def boss_key(self, key):
+        if key.char == self.controls['boss']:
+            self.boss_keyed = not self.boss_keyed
+            print("BOSS")
 class Fruit:
     def __init__(self, sprite_coords, coords, velocity, canvas, flip_image=False):
         self.canvas = canvas
