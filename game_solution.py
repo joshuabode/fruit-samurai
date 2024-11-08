@@ -1,9 +1,18 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import font
 from PIL import ImageTk, Image, ImageDraw
 from random import randint, choice, uniform
 from collections import deque
 from fruit import Fruit, ChoppedFruit
+from fonts import *
+
+"""
+Free sprite sheet sourced from here: https://ninjikin.itch.io/fruit?download
+Font from: https://www.dafont.com/arcade-classic-2.font 
+Backgrounds from : https://limezu.itch.io/moderninteriors
+"""
+
 
 
 class App():
@@ -11,16 +20,26 @@ class App():
 
     def __init__(self):
         start_window = Tk()
+        self.retro_font = font.Font(family="ArcadeClassic", size=20)
+        self.heading_font = font.Font(family="TkHeadingFont", size=36, weight='bold')
         start_window.title("Fruit Samurai")
         self.menu = start_window
+        self.leader_news = "Joshua Bode\nis leading\nwith a score of\novdr 9000"
         self.init_menu()
 
     def init_menu(self):
         root = self.menu
-        title = Label(root, text="Fruit Samurai", font=("TkHeadingFont", 36, 'bold'))
-        new_game = Button(root, text="New Game", command=self.new_game)
-        title.pack()
-        new_game.pack()
+        title = Label(root, text="Fruit Samurai", font=self.heading_font)
+        buttons = [None for _ in range(6)]
+        buttons[0] = Button(root, text="New Game", command=self.new_game)
+        buttons[1] = Button(root, text="Load Game", command=self.load_game)
+        buttons[2] = Button(root, text="Settings", command=self.settings)
+        buttons[3] = Button(root, text="How to Play", command=self.tutorial)
+        buttons[4] = Button(root, text="Quit", command=self.menu.destroy)
+        buttons[5] = Button(root, text=self.leader_news, command=self.leaderboard)
+        title.grid(column=0, row=0, padx=100)
+        for i, button in enumerate(buttons):
+            button.grid(column=0, row=i+1)
         root.mainloop()
 
     def new_game(self):
@@ -35,6 +54,17 @@ class App():
         self.game_window = game_window
         game_window.mainloop()
 
+    def load_game(self):
+        pass
+    
+    def settings(self):
+        pass
+
+    def tutorial(self):
+        pass
+
+    def leaderboard(self):
+        pass
 
 class Game(Canvas):
     def create_label(self, text, x, y, anchor):
@@ -64,10 +94,11 @@ class Game(Canvas):
                         13, 17, 18, 19, 
                         21, 22, 23, 26, 37]
         self.key_history = deque([], 9)      # Double-ended queue acting as memory to check for the cheatcode
+        self.hit_or_miss = deque([], 10)    # Double-ended queue used to calculate rolling accuracy to dynamically update difficulty
         self.lives = 5
         self.score = 0
         self.streak = 0
-        self.font = ("TkDefaultFont", 20, 'bold')
+        self.font = ("arcade.ttf", 20, 'bold')
         self.lv_content = StringVar(master=self.window, value=f"Lives: {self.lives}")
         self.sc_content = StringVar(master=self.window, value=f"Score: {self.score}")
         self.st_content = StringVar(master=self.window, value=f"Streak: {self.streak}")
@@ -84,24 +115,24 @@ class Game(Canvas):
         self.bind("<Motion>", self.mouse_velocity)
   
     def update(self):
-        self.lives_text['textvariable'] = self.lv_content
-        self.score_text['textvariable'] = self.sc_content
-        self.streak_text['textvariable'] = self.st_content
+        if not self.game_ended:
+            if self.paused:
+                pass
+            else:
+                self.lives_text['textvariable'] = self.lv_content
+                self.score_text['textvariable'] = self.sc_content
+                self.streak_text['textvariable'] = self.st_content
 
-        self.lv_content.set(f"Lives: {self.lives}")
-        self.sc_content.set(f"Score: {int(self.score)}")
-        self.st_content.set(f"Streak: {self.streak}")
-        if self.streak:
-            self.interval = min(2000, int(10000/self.streak))
-        else:
-            self.interval = 2000
-        if self.lives < 1:
-            self.game_over()
-        if not self.game_ended and not self.paused:
+                self.lv_content.set(f"Lives: {self.lives}")
+                self.sc_content.set(f"Score: {int(self.score)}")
+                self.st_content.set(f"Streak: {self.streak}")
+                self.interval = 2000 -125*sum(self.hit_or_miss)
+                if self.lives < 1:
+                    self.game_over()
+                
             self.after(500, self.update)
 
     def key_in(self, key):
-        print(self.controls)
         self.check_cheat(key)
         if key.char == self.controls['pause']:
             self.pause(key)
@@ -110,14 +141,17 @@ class Game(Canvas):
 
 
     def new_fruit(self):
-        fruit = Fruit(  (choice(self.fruit_indicies)*16, 16),
-                        (randint(self.fruit_size, self.width-self.fruit_size), self.height-self.fruit_size),
-                        (uniform(-3, 3)*self.ppm, uniform(-6.64, -4)*self.ppm),
-                        self)
-        self.tag_bind(fruit.object, "<Enter>", fruit.delete)    # Delete fruit when mouse hovers over it
 
-        # New fruit is projected at a random interval = INTERVAL +/- 0.5 seconds 
-        if not self.game_ended and not self.paused:
+        if not self.game_ended:
+            if self.paused:
+                pass
+            else:
+                fruit = Fruit(  (choice(self.fruit_indicies)*16, 16),
+                (randint(self.fruit_size, self.width-self.fruit_size), self.height-self.fruit_size),
+                (uniform(-3, 3)*self.ppm, uniform(-6.64, -4)*self.ppm), self)
+                self.tag_bind(fruit.object, "<Enter>", fruit.delete)    # Delete fruit when mouse hovers over it
+                # New fruit is projected at a random interval = INTERVAL +/- 0.5 seconds 
+                
             self.after(randint(self.interval-500, self.interval+500), self.new_fruit)     
 
     def mouse_velocity(self, event):
@@ -129,33 +163,41 @@ class Game(Canvas):
 
     def check_cheat(self, key):
         self.key_history.append(key.char)
-        if ''.join(self.key_history) == 'halfbrick':    # "Halfbrick", (the developers of the original game) is the cheat code
-            self.cheating = True
+        if ''.join(self.key_history) == 'floor':    # Cheatcode is floor
+            self.cheating = not self.cheating
 
     def pause(self, key):
-        
-        print("UOFJLIFIS")
-        if key.char == self.controls['pause']:
-            self.paused = not self.paused
-            print(self.paused)
+        self.paused = not self.paused
         if self.paused:
-            pause_label = Label(self, text="Paused", font=("TkHeadingFont", 36, 'bold'))
-            pause_text = self.create_window(self.width/2, self.height/2, anchor='center', window=pause_label)
-            unpause = Button(self, text="Unpause", command=self.pause(key))
-            unpause_button = self.create_window(self.width/2, self.height*4/7, anchor='center', window=unpause)
-            print("PAUSE")
-        if not self.paused:
-            self.delete(pause_text)
-            self.delete(unpause_button)
+            self.pause_label = Label(self, text="Paused", font=("ArcadeClassic", 36, 'bold'))
+            self.pause_text = self.create_window(self.width/2, self.height/2, anchor='center', window=self.pause_label)
+        else:
+            self.delete(self.pause_text)
 
     def boss_key(self, key):
-        if key.char == self.controls['boss']:
-            self.boss_keyed = not self.boss_keyed
-            print("BOSS")
+        self.boss_keyed = not self.boss_keyed
+        if self.boss_keyed:
+            w = self.window.winfo_screenwidth()
+            h = self.window.winfo_screenheight()
+            self.boss_window = Toplevel()
+            self.boss_window.title = "Macrohard Excel"
+            self.boss_window.attributes('-fullscreen', True)
+            canvas = Canvas(self.boss_window, 
+                         width=w,
+                         height=h)
+            img = ImageTk.PhotoImage(master=canvas, 
+                                     image=Image.open("boss.jpg").resize((w, h), Image.Resampling.BICUBIC))
+            canvas.pack(expand=True)
+            canvas.create_image(0, 0, image=img, anchor='nw')
+            self.boss_window.bind("<Key-b>", self.boss_key)
+            self.pause(key)
+            self.boss_window.mainloop()
+        else:
+            self.boss_window.destroy()
 
     def game_over(self):
         self.game_ended = True
-        game_over_label = Label(self, text="Game Over", font=("TkHeadingFont", 36, 'bold'))
+        game_over_label = Label(self, text="Game Over", font=("ArcadeClassic", 36, 'bold'))
         self.create_window(self.width/2, self.height/2, anchor='center', window=game_over_label)
 
 # Driver code to initialise the app
