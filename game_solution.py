@@ -11,6 +11,7 @@ from fonts import *
 Free sprite sheet sourced from here: https://ninjikin.itch.io/fruit?download
 Font from: https://www.dafont.com/arcade-classic-2.font 
 Backgrounds from : https://limezu.itch.io/moderninteriors
+https://limezu.itch.io/kitchen
 """
 
 
@@ -29,14 +30,22 @@ class App():
 
     def init_menu(self):
         root = self.menu
-        title = Label(root, text="Fruit Samurai", font=self.heading_font)
+        img = ImageTk.PhotoImage(image=Image.open('background.png'))
+        image_label = Label(master=root, image=img)
+        image_label.place(x=0, y=0)
+        title = Label(root, text="Fruit Samurai", font=self.heading_font, bg="#bbefe3")
         buttons = [None for _ in range(6)]
-        buttons[0] = Button(root, text="New Game", command=self.new_game)
-        buttons[1] = Button(root, text="Load Game", command=self.load_game)
-        buttons[2] = Button(root, text="Settings", command=self.settings)
-        buttons[3] = Button(root, text="How to Play", command=self.tutorial)
-        buttons[4] = Button(root, text="Quit", command=self.menu.destroy)
-        buttons[5] = Button(root, text=self.leader_news, command=self.leaderboard)
+        # b_images = [ImageTk.PhotoImage(image=Image.open("b1.png")),
+        #             ImageTk.PhotoImage(image=Image.open("b2.png")),
+        #             ImageTk.PhotoImage(image=Image.open("b3.png")),
+        #             ImageTk.PhotoImage(image=Image.open("b4.png")),
+        #             ImageTk.PhotoImage(image=Image.open("b5a.png")),]
+        buttons[0] = Button(root, text="New Game", command=self.new_game, highlightbackground='#bbefe3')
+        buttons[1] = Button(root, text="Load Game", command=self.load_game, highlightbackground='#bbefe3')
+        buttons[2] = Button(root, text="Settings", command=self.settings, highlightbackground='#bbefe3')
+        buttons[3] = Button(root, text="How to Play", command=self.tutorial, highlightbackground='#bbefe3')
+        buttons[4] = Button(root, text="Quit", command=self.menu.destroy, highlightbackground='#bbefe3')
+        buttons[5] = Button(root, text=self.leader_news, command=self.leaderboard, highlightbackground='#bbefe3')
         title.grid(column=0, row=0, padx=100)
         for i, button in enumerate(buttons):
             button.grid(column=0, row=i+1)
@@ -47,10 +56,11 @@ class App():
         game_window = Tk()
         game_window.title("Fruit Samurai")
         game_window.resizable(False, False)
-        self.main_game = Game(game_window, 960, 540)
+        w, h = 960, 540
+        self.main_game = Game(game_window, w, h)
         game_window.bind("<Key>", self.main_game.key_in)
-        self.main_game.new_fruit() 
         self.main_game.pack()
+        self.main_game.new_fruit() 
         self.game_window = game_window
         game_window.mainloop()
 
@@ -74,7 +84,7 @@ class Game(Canvas):
 
     def __init__(self, window,  w, h):
         self.window = window
-        super().__init__(master=window, width=w, height=h)
+        super().__init__(master=window, width=w, height=h, background="#f0d7a1")
         self.m_x = None             # Holding previous mouse x-position
         self.m_y = None             # Holding previous mouse y-position
         self.m_vel = (None, None)   # Holding mouse velocity
@@ -99,12 +109,12 @@ class Game(Canvas):
         self.score = 0
         self.streak = 0
         self.font = ("arcade.ttf", 20, 'bold')
-        self.lv_content = StringVar(master=self.window, value=f"Lives: {self.lives}")
-        self.sc_content = StringVar(master=self.window, value=f"Score: {self.score}")
-        self.st_content = StringVar(master=self.window, value=f"Streak: {self.streak}")
-        self.lives_text = self.create_label(self.lv_content, 10, 10, 'nw')         
-        self.score_text = self.create_label(self.sc_content, self.width/2, 10, 'n')
-        self.streak_text = self.create_label(self.st_content, self.width - 10, 10, 'ne')
+        self.lv_content = Label(self, text=f"Lives: {self.lives}", bg="#f0d7a1", font=("ArcadeClassic", 24, 'bold'), fg='black')
+        self.sc_content = Label(self, text=f"Score: {self.score}", bg="#f0d7a1", font=("ArcadeClassic", 24, 'bold'), fg='black')
+        self.st_content = Label(self, text=f"Streak: {self.streak}", bg="#f0d7a1", font=("ArcadeClassic", 24, 'bold'), fg='black')
+        self.lives_text = self.create_window(10, 10, anchor='nw', window=self.lv_content)         
+        self.score_text = self.create_window(self.width/2, 10, anchor='n', window=self.sc_content)
+        self.streak_text = self.create_window(self.width - 10, 10, anchor='ne', window=self.st_content)
         self.controls = {}
         self.game_ended = False
         with open('controls.txt', 'r') as file:
@@ -113,20 +123,15 @@ class Game(Canvas):
                 self.controls[bind[0]] = bind[1]
         self.update()
         self.bind("<Motion>", self.mouse_velocity)
-  
+
     def update(self):
         if not self.game_ended:
             if self.paused:
                 pass
             else:
-                self.lives_text['textvariable'] = self.lv_content
-                self.score_text['textvariable'] = self.sc_content
-                self.streak_text['textvariable'] = self.st_content
-
-                self.lv_content.set(f"Lives: {self.lives}")
-                self.sc_content.set(f"Score: {int(self.score)}")
-                self.st_content.set(f"Streak: {self.streak}")
-                self.interval = 2000 -125*sum(self.hit_or_miss)
+                self.lv_content.config(text=f"Lives: {self.lives}")
+                self.sc_content.config(text=f"Score: {int(self.score)}")
+                self.st_content.config(text=f"Streak: {self.streak}")
                 if self.lives < 1:
                     self.game_over()
                 
