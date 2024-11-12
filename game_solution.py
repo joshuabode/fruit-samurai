@@ -7,7 +7,7 @@ from random import randint, choice, uniform
 from collections import deque
 from fruit import Fruit, ChoppedFruit
 from fonts import *
-from game import Game
+from game import Game, Tutorial
 
 """
 Free sprite sheet sourced from here: https://ninjikin.itch.io/fruit?download
@@ -114,7 +114,11 @@ class App():
             messagebox.showerror("You cannot set the pause and boss key binds to the same key")
 
     def tutorial(self):
-        pass
+        tutorial = Toplevel()
+        c = Tutorial(tutorial, 960, 540)
+        c.pack()
+        c.new_fruit()
+        tutorial.mainloop()
 
     def leaderboard(self):
         pass

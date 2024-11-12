@@ -1,13 +1,14 @@
 from PIL import ImageTk, Image
-from random import randint
+from random import choice
 
 class Fruit:
     def __init__(self, sprite_coords, coords, velocity, canvas, flip_image=False, shape=False):
         self.canvas = canvas
         self.height, self.width = canvas.height, canvas.width
-        self.s_x, s_y = sprite_coords
         self.x, self.y = coords
+        self.s_x, s_y = sprite_coords
         self.v_x, self.v_y = velocity
+        self.shape = shape
         if not shape:
             if self.s_x//16 == 26:      # If the fruit is a watermelon, scale the image up slightly
                 scale = 1.5
@@ -23,7 +24,10 @@ class Fruit:
             self.image = ImageTk.PhotoImage(master=self.canvas, image=self.sprite)
             self.object = canvas.create_image(self.x, self.y, image=self.image, anchor='center')
         else:
-            self.object = canvas.create_oval(self.x, self.y, self.x+64, self.y+64, fill="red")
+            fruit_shapes = [canvas.create_oval(self.x, self.y, self.x+50, self.y+50, fill="red", outline="red"),
+                            canvas.create_oval(self.x, self.y, self.x+50, self.y+50, fill="yellow", outline="yellow"),
+                            canvas.create_oval(self.x, self.y, self.x+50, self.y+50, fill="brown", outline="brown")]
+            self.object = choice(fruit_shapes) 
         self.bbox = self.canvas.bbox(self.object)
         self.deleted = False
         self.tick()
@@ -36,17 +40,18 @@ class Fruit:
                 self.canvas.lives += 1
             self.canvas.hit_or_miss.append(True)
             self.canvas.score += self.canvas.streak*0.2*max(10, (0.1*(self.canvas.m_vel[0]**2 + self.canvas.m_vel[1]**2)**0.5))
-            # Generates two halves of chopped fruit
-            left = ChoppedFruit((self.s_x, 5*16),
-                    (self.canvas.coords(self.object)[0]-16, self.canvas.coords(self.object)[1]),
-                    (0.2*self.canvas.m_vel[0]-50, 0.2*self.canvas.m_vel[1]),
-                    self.canvas, False)
-            right = ChoppedFruit((self.s_x, 5*16),
-                    (self.canvas.coords(self.object)[0]+16, self.canvas.coords(self.object)[1]),
-                    (0.2*self.canvas.m_vel[0]+50, 0.2*self.canvas.m_vel[1]),
-                    self.canvas, True)
-            self.canvas.tag_bind(left.object, "<Enter>", left.delete) 
-            self.canvas.tag_bind(right.object, "<Enter>", right.delete) 
+            if not self.shape:
+                # Generates two halves of chopped fruit
+                left = ChoppedFruit((self.s_x, 5*16),
+                        (self.canvas.coords(self.object)[0]-16, self.canvas.coords(self.object)[1]),
+                        (0.2*self.canvas.m_vel[0]-50, 0.2*self.canvas.m_vel[1]),
+                        self.canvas, False)
+                right = ChoppedFruit((self.s_x, 5*16),
+                        (self.canvas.coords(self.object)[0]+16, self.canvas.coords(self.object)[1]),
+                        (0.2*self.canvas.m_vel[0]+50, 0.2*self.canvas.m_vel[1]),
+                        self.canvas, True)
+                self.canvas.tag_bind(left.object, "<Enter>", left.delete) 
+                self.canvas.tag_bind(right.object, "<Enter>", right.delete) 
             # Removes the old sprite from the canvas
             self.canvas.delete(self.object)
     
