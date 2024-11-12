@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from tkinter import font
 from PIL import ImageTk, Image, ImageDraw
 from random import randint, choice, uniform
@@ -53,13 +53,16 @@ class App():
             button.grid(column=0, row=i+1)
         root.mainloop()
 
-    def new_game(self):
+    def new_game(self, game_data=None):
         self.menu.destroy()
         game_window = Tk()
         game_window.title("Fruit Samurai")
         game_window.resizable(False, False)
         w, h = 960, 540
-        self.main_game = Game(game_window, w, h)
+        if game_data:
+            self.main_game = Game(game_window, w, h, *game_data)
+        else:
+            self.main_game = Game(game_window, w, h)
         game_window.bind("<Key>", self.main_game.key_in)
         self.main_game.pack()
         self.main_game.new_fruit() 
@@ -67,7 +70,8 @@ class App():
         game_window.mainloop()
 
     def load_game(self):
-        pass
+        file = filedialog.askopenfile(mode='r')
+        self.new_game(eval(file.read()))
     
     def settings(self):
         with open('controls.txt', 'r') as file:

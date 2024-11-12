@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import messagebox
+from tkinter import filedialog
 from tkinter import font
 from PIL import ImageTk, Image, ImageDraw
 from random import randint, choice, uniform
@@ -9,12 +9,7 @@ from fruit import Fruit, ChoppedFruit
 from fonts import *
 
 class Game(Canvas):
-    def create_label(self, text, x, y, anchor):
-        label = Label(self.window, text=text, font=self.font)
-        self.object = self.create_window(x, y, anchor=anchor, window=label)
-        return label
-
-    def __init__(self, window,  w, h):
+    def __init__(self, window, w, h, lives=5, score=0, streak=0, hit_or_miss=[]):
         self.window = window
         super().__init__(master=window, width=w, height=h, background="#f0d7a1")
         self.m_x = None             # Holding previous mouse x-position
@@ -37,10 +32,10 @@ class Game(Canvas):
                         13, 17, 18, 19, 
                         21, 22, 23, 26, 37]
         self.key_history = deque([], 8)      # Double-ended queue acting as memory to check for the cheatcode
-        self.hit_or_miss = deque([], 50)    # Double-ended queue used to calculate rolling accuracy to dynamically update difficulty
-        self.lives = 5
-        self.score = 0
-        self.streak = 0
+        self.hit_or_miss = deque(hit_or_miss, maxlen=10)    # Double-ended queue used to calculate rolling accuracy to dynamically update difficulty
+        self.lives = lives
+        self.score = score
+        self.streak = streak
         self.font = ("arcade.ttf", 20, 'bold')
         self.lv_content = Label(self, text=f"Lives: {self.lives}", bg="#f0d7a1", font=("ArcadeClassic", 24, 'bold'), fg='black')
         self.sc_content = Label(self, text=f"Score: {self.score}", bg="#f0d7a1", font=("ArcadeClassic", 24, 'bold'), fg='black')
@@ -54,7 +49,8 @@ class Game(Canvas):
         self.bind("<Motion>", self.mouse_velocity)
 
     def update(self):
-        self.interval = 2000/(1+0.01*sum(self.hit_or_miss)**2)
+        self.interval = int(2000/(1+0.06*sum(self.hit_or_miss)**2))
+        print(self.interval)
         if not self.game_ended:
             if self.paused:
                 pass
@@ -66,6 +62,11 @@ class Game(Canvas):
                     self.game_over()
                 
             self.after(500, self.update)
+
+    def create_label(self, text, x, y, anchor):
+        label = Label(self.window, text=text, font=self.font)
+        self.object = self.create_window(x, y, anchor=anchor, window=label)
+        return label
 
     def key_in(self, key):
         self.check_cheat(key)
@@ -106,8 +107,17 @@ class Game(Canvas):
         if self.paused:
             self.pause_label = Label(self, text="Paused", font=("ArcadeClassic", 36, 'bold'), bg="#f0d7a1", fg='black')
             self.pause_text = self.create_window(self.width/2, self.height/2, anchor='center', window=self.pause_label)
+            self.save_button = Button(self, text="Save Game", command=self.save_game, bg="#f0d7a1")
+            self.save_window = self.create_window(self.width/2, self.height/2 + 50 , anchor='center', window=self.save_button)
         else:
             self.delete(self.pause_text)
+            self.delete(self.save_window)
+
+    def save_game(self):
+        vars = (self.lives, self.score, self.streak, list(self.hit_or_miss))
+        file = filedialog.asksaveasfile('w', defaultextension=".txt")
+        file.write(str(vars))
+        file.close()
 
     def boss_key(self, key):
         self.boss_keyed = not self.boss_keyed
