@@ -49,7 +49,7 @@ class Game(Canvas):
         self.bind("<Motion>", self.mouse_velocity)
 
     def update(self):
-        self.interval = int(2000/(1+0.06*sum(self.hit_or_miss)**2))
+        self.interval = int(2000/(1+0.02*sum(self.hit_or_miss)**2))
         print(self.interval)
         if not self.game_ended:
             if self.paused:
@@ -141,6 +141,9 @@ class Game(Canvas):
             self.boss_window.destroy()
 
     def game_over(self):
-        self.game_ended = True
         game_over_label = Label(self, text="Game Over", font=("ArcadeClassic", 36, 'bold'), bg="#f0d7a1", fg='black')
         self.create_window(self.width/2, self.height/2, anchor='center', window=game_over_label)
+        for i in range(15):
+            self.new_fruit()
+        self.game_ended = True
+
