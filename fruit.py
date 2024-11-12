@@ -1,24 +1,29 @@
 from PIL import ImageTk, Image
+from random import randint
 
 class Fruit:
-    def __init__(self, sprite_coords, coords, velocity, canvas, flip_image=False):
+    def __init__(self, sprite_coords, coords, velocity, canvas, flip_image=False, shape=False):
         self.canvas = canvas
         self.height, self.width = canvas.height, canvas.width
         self.s_x, s_y = sprite_coords
         self.x, self.y = coords
         self.v_x, self.v_y = velocity
-        if self.s_x//16 == 26:      # If the fruit is a watermelon, scale the image up slightly
-            scale = 1.5
+        if not shape:
+            if self.s_x//16 == 26:      # If the fruit is a watermelon, scale the image up slightly
+                scale = 1.5
+            else:
+                scale = 1
+            self.sprite = canvas.sprite_sheet.crop((self.s_x, s_y, self.s_x+16, s_y+16))
+            self.sprite = self.sprite.resize((int(self.canvas.fruit_size*scale), 
+                                            int(self.canvas.fruit_size*scale)), 
+                                            Image.Resampling.NEAREST)
+            if flip_image:
+                self.sprite = self.sprite.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+
+            self.image = ImageTk.PhotoImage(master=self.canvas, image=self.sprite)
+            self.object = canvas.create_image(self.x, self.y, image=self.image, anchor='center')
         else:
-            scale = 1
-        self.sprite = canvas.sprite_sheet.crop((self.s_x, s_y, self.s_x+16, s_y+16))
-        self.sprite = self.sprite.resize((int(self.canvas.fruit_size*scale), 
-                                        int(self.canvas.fruit_size*scale)), 
-                                        Image.Resampling.NEAREST)
-        if flip_image:
-            self.sprite = self.sprite.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
-        self.image = ImageTk.PhotoImage(master=self.canvas, image=self.sprite)
-        self.object = canvas.create_image(self.x, self.y, image=self.image, anchor='center')
+            self.object = canvas.create_oval(self.x, self.y, self.x+64, self.y+64, fill="red")
         self.bbox = self.canvas.bbox(self.object)
         self.deleted = False
         self.tick()
