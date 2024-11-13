@@ -11,7 +11,7 @@ from fonts import *
 class Game(Canvas):
     def __init__(self, window, w, h, lives=5, score=0, streak=0, hit_or_miss=[]):
         self.window = window
-        super().__init__(master=window, width=w, height=h, background="#f0d7a1")
+        super().__init__(master=window, width=w, height=h, background="#f0d7a1", cursor="star")
         self.m_x = None             # Holding previous mouse x-position
         self.m_y = None             # Holding previous mouse y-position
         self.m_vel = (None, None)   # Holding mouse velocity
