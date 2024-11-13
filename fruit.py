@@ -80,7 +80,8 @@ class Fruit:
                 self.canvas.streak = 0
                 self.canvas.hit_or_miss.append(False)
                 self.canvas.lives -= 1
-            self.delete(None)
+            self.deleted = True
+            self.canvas.fruits.remove(self)
         if not(self.grounded and self.canvas.cheating):
             self.v_y += self.canvas.g*self.canvas.ppm*self.canvas.dt
         dx += self.v_x*self.canvas.dt
