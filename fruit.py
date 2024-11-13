@@ -6,15 +6,16 @@ class Fruit:
         self.canvas = canvas
         self.height, self.width = canvas.height, canvas.width
         self.x, self.y = coords
-        self.s_x, s_y = sprite_coords
+        self.s_x, self.s_y = sprite_coords
         self.v_x, self.v_y = velocity
         self.shape = shape
+        self.flip_image = flip_image
         if not shape:
             if self.s_x//16 == 26:      # If the fruit is a watermelon, scale the image up slightly
                 scale = 1.5
             else:
                 scale = 1
-            self.sprite = canvas.sprite_sheet.crop((self.s_x, s_y, self.s_x+16, s_y+16))
+            self.sprite = canvas.sprite_sheet.crop((self.s_x, self.s_y, self.s_x+16, self.s_y+16))
             self.sprite = self.sprite.resize((int(self.canvas.fruit_size*scale), 
                                             int(self.canvas.fruit_size*scale)), 
                                             Image.Resampling.NEAREST)
@@ -53,6 +54,7 @@ class Fruit:
                 self.canvas.tag_bind(left.object, "<Enter>", left.delete) 
                 self.canvas.tag_bind(right.object, "<Enter>", right.delete) 
             # Removes the old sprite from the canvas
+            self.canvas.fruits.remove(self)
             self.canvas.delete(self.object)
     
     def displace(self):
@@ -74,11 +76,11 @@ class Fruit:
             self.v_y = -self.v_y*self.canvas.e
             dy = -(bottom-self.height)
         if top >= self.height:
-            self.deleted = True
             if self.__class__.__name__ == "Fruit":
                 self.canvas.streak = 0
                 self.canvas.hit_or_miss.append(False)
                 self.canvas.lives -= 1
+            self.delete(None)
         if not(self.grounded and self.canvas.cheating):
             self.v_y += self.canvas.g*self.canvas.ppm*self.canvas.dt
         dx += self.v_x*self.canvas.dt
@@ -95,6 +97,10 @@ class Fruit:
                 self.canvas.move(self.object, *self.displace())
                 self.bbox = self.canvas.bbox(self.object)
             self.canvas.after(int(1000*self.canvas.dt), self.tick)
+
+    def pack(self) -> str:
+        vars = [(self.s_x, self.s_y), (self.x, self.y), (self.v_x, self.v_y), None, self.flip_image, self.shape]
+        return str(vars)
             
 
 class ChoppedFruit(Fruit):
@@ -105,4 +111,5 @@ class ChoppedFruit(Fruit):
     def delete(self, _):
         if self.grounded:
             self.deleted = True
+            self.canvas.fruits.remove(self)
             self.canvas.delete(self.object)

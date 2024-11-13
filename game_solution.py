@@ -6,8 +6,7 @@ from PIL import ImageTk, Image, ImageDraw
 from random import randint, choice, uniform
 from collections import deque
 from fruit import Fruit, ChoppedFruit
-from fonts import *
-from game import Game, Tutorial
+from game import Game
 
 """
 Free sprite sheet sourced from here: https://ninjikin.itch.io/fruit?download
@@ -27,7 +26,6 @@ class App():
         self.heading_font = font.Font(family="TkHeadingFont", size=36, weight='bold')
         start_window.title("Fruit Samurai")
         self.menu = start_window
-        self.leader_news = "Joshua Bode\nis leading\nwith a score of\novdr 9000"
         self.init_menu()
 
     def init_menu(self):
@@ -47,25 +45,30 @@ class App():
         buttons[2] = Button(root, text="Settings", command=self.settings, highlightbackground='#bbefe3')
         buttons[3] = Button(root, text="How to Play", command=self.tutorial, highlightbackground='#bbefe3')
         buttons[4] = Button(root, text="Quit", command=self.menu.destroy, highlightbackground='#bbefe3')
-        buttons[5] = Button(root, text=self.leader_news, command=self.leaderboard, highlightbackground='#bbefe3')
+        buttons[5] = Button(root, text="Leaderboard", command=self.leaderboard, highlightbackground='#bbefe3')
         title.grid(column=0, row=0, padx=100)
         for i, button in enumerate(buttons):
             button.grid(column=0, row=i+1)
         root.mainloop()
 
     def new_game(self, game_data=None):
-        self.menu.destroy()
-        game_window = Tk()
+        game_window = Toplevel()
         game_window.title("Fruit Samurai")
         game_window.resizable(False, False)
         w, h = 960, 540
         if game_data:
-            self.main_game = Game(game_window, w, h, *game_data)
+            self.main_game = Game(game_window, w, h, *game_data[:-1])
+            print(game_data[-1], type(game_data[-1]))
+            for fruit in game_data[-1]:
+               fruit = eval(fruit)
+               print(fruit, type(fruit))
+               fruit[3] = self.main_game
+               self.main_game.old_fruit(fruit) 
         else:
             self.main_game = Game(game_window, w, h)
+            self.main_game.new_fruit() 
         game_window.bind("<Key>", self.main_game.key_in)
         self.main_game.pack()
-        self.main_game.new_fruit() 
         self.game_window = game_window
         game_window.mainloop()
 
@@ -121,7 +124,8 @@ class App():
         tutorial.mainloop()
 
     def leaderboard(self):
-        pass
+        leaderboard = Toplevel()
+        leaderboard.mainloop()
 
     
 # Driver code to initialise the app
