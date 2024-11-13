@@ -117,11 +117,7 @@ class App():
             messagebox.showerror("You cannot set the pause and boss key binds to the same key")
 
     def tutorial(self):
-        tutorial = Toplevel()
-        c = Tutorial(tutorial, 960, 540)
-        c.pack()
-        c.new_fruit()
-        tutorial.mainloop()
+        pass
 
     def leaderboard(self):
         leaderboard = Toplevel()
