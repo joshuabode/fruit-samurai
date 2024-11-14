@@ -47,10 +47,12 @@ class Fruit:
                         (self.canvas.coords(self.object)[0]-16, self.canvas.coords(self.object)[1]),
                         (0.2*self.canvas.m_vel[0]-50, 0.2*self.canvas.m_vel[1]),
                         self.canvas, False)
+                self.canvas.fruits.append(left)
                 right = ChoppedFruit((self.s_x, 5*16),
                         (self.canvas.coords(self.object)[0]+16, self.canvas.coords(self.object)[1]),
                         (0.2*self.canvas.m_vel[0]+50, 0.2*self.canvas.m_vel[1]),
                         self.canvas, True)
+                self.canvas.fruits.append(right)
                 self.canvas.tag_bind(left.object, "<Enter>", left.delete) 
                 self.canvas.tag_bind(right.object, "<Enter>", right.delete) 
             # Removes the old sprite from the canvas
@@ -86,6 +88,8 @@ class Fruit:
             self.v_y += self.canvas.g*self.canvas.ppm*self.canvas.dt
         dx += self.v_x*self.canvas.dt
         dy += self.v_y*self.canvas.dt
+        self.x += dx
+        self.y += dy
         return (dx, dy)
 
 

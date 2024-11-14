@@ -1,1 +1,0 @@
-(1000, 178978896789, 0, [True, False, False, True, True, True, False, False])

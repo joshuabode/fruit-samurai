@@ -50,7 +50,7 @@ class Game(Canvas):
         self.bind("<Motion>", self.mouse_handler)
 
     def update(self):
-        print([f.pack() for f in self.fruits])
+        print(self.fruits)
         self.interval = int(2000/(1+0.02*sum(self.hit_or_miss)**2))
         try:
             self.delete(min(self.find_withtag("mouse")))
@@ -90,7 +90,6 @@ class Game(Canvas):
                 (randint(self.fruit_size, self.width-self.fruit_size), self.height-self.fruit_size),
                 (uniform(-3, 3)*self.ppm, uniform(-6.64, -4)*self.ppm), self)
                 self.fruits.append(fruit)
-                print(self.fruits)
                 self.tag_bind(fruit.object, "<Enter>", fruit.delete)    # Delete fruit when mouse hovers over it
                 # New fruit is projected at a random interval = INTERVAL +/- 0.1 seconds 
                 
@@ -131,6 +130,7 @@ class Game(Canvas):
 
     def save_game(self):
         vars = (self.lives, self.score, self.streak, list(self.hit_or_miss), [f.pack() for f in self.fruits])
+        print(vars)
         file = filedialog.asksaveasfile('w', defaultextension=".txt")
         file.write(str(vars))
         file.close()
@@ -161,9 +161,8 @@ class Game(Canvas):
         self.create_window(self.width/2, self.height/2, anchor='center', window=game_over_label)
         leaderboard = Button(self, text="Leaderboard", command=self.leaderboard, highlightbackground='#f0d7a1')
         self.create_window(self.width/2, self.height/2 + 50, anchor='center', window=leaderboard)
-        for _ in range(15):
+        for _ in range(10):
             self.new_fruit()
-            time.sleep(0.2)
         self.game_ended = True
 
     def leaderboard(self):

@@ -64,6 +64,7 @@ class App():
                print(fruit, type(fruit))
                fruit[3] = self.main_game
                self.main_game.old_fruit(fruit) 
+            self.main_game.after(max(0, randint(self.main_game.interval-100, self.main_game.interval+100)), self.main_game.new_fruit) 
         else:
             self.main_game = Game(game_window, w, h)
             self.main_game.new_fruit() 
