@@ -82,6 +82,8 @@ class Fruit:
                 self.canvas.streak = 0
                 self.canvas.hit_or_miss.append(False)
                 self.canvas.lives -= 1
+                self.canvas.configure(bg="red")
+                self.canvas.after(100, lambda: self.canvas.configure(bg="#f0d7a1"))
             self.deleted = True
             self.canvas.fruits.remove(self)
         if not(self.grounded and self.canvas.cheating):
