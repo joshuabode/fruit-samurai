@@ -9,7 +9,7 @@ from fruit import Fruit, ChoppedFruit
 import pickle
 
 class Game(Canvas):
-    def __init__(self, window, w, h, lives=5, score=0, streak=0, hit_or_miss=[]):
+    def __init__(self, window, w, h, lives=5, score=0, streak=0, hit_or_miss=[None for _ in range(50)]):
         self.window = window
         super().__init__(master=window, width=w, height=h, background="#f0d7a1", cursor="star")
         self.m_x = None             # Holding previous mouse x-position
@@ -34,7 +34,7 @@ class Game(Canvas):
                         13, 17, 18, 19, 
                         21, 22, 23, 26, 37]
         self.key_history = deque([], 8)      # Double-ended queue acting as memory to check for the cheatcode
-        self.hit_or_miss = deque(hit_or_miss, maxlen=10)    # Double-ended queue used to calculate rolling accuracy to dynamically update difficulty
+        self.hit_or_miss = deque(hit_or_miss, maxlen=50)    # Double-ended queue used to calculate rolling accuracy to dynamically update difficulty
         self.lives = lives
         self.score = score
         self.streak = streak
@@ -51,7 +51,8 @@ class Game(Canvas):
         self.bind("<Motion>", self.mouse_handler)
 
     def update(self):
-        self.interval = int(2000/(1+0.02*sum(self.hit_or_miss)**2))
+        self.interval = interval(self.streak)
+        print(self.interval)
         try:
             self.delete(min(self.find_withtag("mouse")))
         except ValueError:
@@ -197,3 +198,16 @@ class Game(Canvas):
             except IndexError:
                 pass
         leaderboard.mainloop()
+
+
+
+def interval(streak):
+    if streak==0:
+        interval = 2000
+    elif streak==1:
+        interval = 1500
+    elif streak==2:
+        interval = 1000
+    else:
+        interval = 1000*2.72**(-0.02*(streak-3))
+    return int(interval)
