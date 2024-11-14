@@ -6,7 +6,7 @@ from PIL import ImageTk, Image, ImageDraw
 from random import randint, choice, uniform
 from collections import deque
 from fruit import Fruit, ChoppedFruit
-import time
+import pickle
 
 class Game(Canvas):
     def __init__(self, window, w, h, lives=5, score=0, streak=0, hit_or_miss=[]):
@@ -50,7 +50,6 @@ class Game(Canvas):
         self.bind("<Motion>", self.mouse_handler)
 
     def update(self):
-        print(self.fruits)
         self.interval = int(2000/(1+0.02*sum(self.hit_or_miss)**2))
         try:
             self.delete(min(self.find_withtag("mouse")))
@@ -130,9 +129,8 @@ class Game(Canvas):
 
     def save_game(self):
         vars = (self.lives, self.score, self.streak, list(self.hit_or_miss), [f.pack() for f in self.fruits])
-        print(vars)
-        file = filedialog.asksaveasfile('w', defaultextension=".txt")
-        file.write(str(vars))
+        file = filedialog.asksaveasfile('wb', defaultextension=".sav")
+        pickle.dump(vars, file)
         file.close()
 
     def boss_key(self, key):

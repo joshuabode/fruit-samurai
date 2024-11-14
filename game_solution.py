@@ -7,6 +7,7 @@ from random import randint, choice, uniform
 from collections import deque
 from fruit import Fruit, ChoppedFruit
 from game import Game
+import pickle
 
 """
 Free sprite sheet sourced from here: https://ninjikin.itch.io/fruit?download
@@ -60,8 +61,6 @@ class App():
             self.main_game = Game(game_window, w, h, *game_data[:-1])
             print(game_data[-1], type(game_data[-1]))
             for fruit in game_data[-1]:
-               fruit = eval(fruit)
-               print(fruit, type(fruit))
                fruit[3] = self.main_game
                self.main_game.old_fruit(fruit) 
             self.main_game.after(max(0, randint(self.main_game.interval-100, self.main_game.interval+100)), self.main_game.new_fruit) 
@@ -74,8 +73,8 @@ class App():
         game_window.mainloop()
 
     def load_game(self):
-        file = filedialog.askopenfile(mode='r')
-        self.new_game(eval(file.read()))
+        file = filedialog.askopenfile(mode='rb')
+        self.new_game(pickle.load(file))
     
     def settings(self):
         with open('controls.txt', 'r') as file:

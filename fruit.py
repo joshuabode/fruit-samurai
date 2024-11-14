@@ -105,7 +105,7 @@ class Fruit:
 
     def pack(self) -> str:
         vars = [(self.s_x, self.s_y), (self.x, self.y), (self.v_x, self.v_y), None, self.flip_image, self.shape]
-        return str(vars)
+        return vars
             
 
 class ChoppedFruit(Fruit):
