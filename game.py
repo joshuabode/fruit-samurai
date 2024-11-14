@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import filedialog
+from tkinter import filedialog, simpledialog
 from tkinter import font
 from PIL import ImageTk, Image, ImageDraw
 from random import randint, choice, uniform
@@ -25,6 +25,7 @@ class Game(Canvas):
         self.fruit_size = 60             # Fruit diameter in pixels 
         self.fruits = []             # List holding the current fruits
         self.cheating = False            # Boolean values for game states
+        self.cheated = False            
         self.paused = False
         self.boss_keyed = False
         self.game_ended = False
@@ -105,7 +106,7 @@ class Game(Canvas):
             self.m_vel = ((event.x - self.m_x)/self.dt, (event.y - self.m_y)/self.dt)
         self.m_x = event.x
         self.m_y = event.y
-        self.create_oval(self.m_x, self.m_y, self.m_x+10, self.m_y+10, fill='#bfa97a', outline="#bfa97a", tags=("mouse"))
+        self.create_oval(self.m_x, self.m_y, self.m_x+10, self.m_y+10, fill='#f5d38c', outline="#f5d38c", tags=("mouse"))
         while len(self.find_withtag("mouse")) > 25:
                self.delete(min(self.find_withtag("mouse")))
 
@@ -113,8 +114,10 @@ class Game(Canvas):
         self.key_history.append(key.keysym)
         if ''.join(self.key_history) == 'LeftRightLeftRightLeftRightDownDown':
             self.cheating = not self.cheating
+            self.cheated = True
         elif ''.join(self.key_history) == 'LeftUpRightUpUpUp':
             self.g = 4
+            self.cheated = True
 
     def pause(self, key):
         self.paused = not self.paused
@@ -122,10 +125,13 @@ class Game(Canvas):
             self.pause_label = Label(self, text="Paused", font=("ArcadeClassic", 36, 'bold'), bg="#f0d7a1", fg='black')
             self.pause_text = self.create_window(self.width/2, self.height/2, anchor='center', window=self.pause_label)
             self.save_button = Button(self, text="Save Game", command=self.save_game, bg="#f0d7a1", highlightbackground="#f0d7a1")
-            self.save_window = self.create_window(self.width/2, self.height/2 + 50 , anchor='center', window=self.save_button)
+            self.save_window = self.create_window(self.width/2, self.height/2 + 30 , anchor='center', window=self.save_button)
+            self.resume_button = Button(self, text="Resume", command=lambda: self.pause(None), bg="#f0d7a1", highlightbackground="#f0d7a1")
+            self.resume_window = self.create_window(self.width/2, self.height/2 + 60 , anchor='center', window=self.resume_button)
         else:
             self.delete(self.pause_text)
             self.delete(self.save_window)
+            self.delete(self.resume_window)
 
     def save_game(self):
         vars = (self.lives, self.score, self.streak, list(self.hit_or_miss), [f.pack() for f in self.fruits])
@@ -158,10 +164,36 @@ class Game(Canvas):
         game_over_label = Label(self, text="Game Over", font=("ArcadeClassic", 36, 'bold'), bg="#f0d7a1", fg='black')
         self.create_window(self.width/2, self.height/2, anchor='center', window=game_over_label)
         leaderboard = Button(self, text="Leaderboard", command=self.leaderboard, highlightbackground='#f0d7a1')
-        self.create_window(self.width/2, self.height/2 + 50, anchor='center', window=leaderboard)
+        self.create_window(self.width/2, self.height/2 + 30, anchor='center', window=leaderboard)
+        save_score = Button(self, text="Save Score to Leaderboard", command=self.save_score, highlightbackground='#f0d7a1')
+        self.create_window(self.width/2, self.height/2 + 60, anchor='center', window=save_score)
         for _ in range(10):
             self.new_fruit()
         self.game_ended = True
 
+    def save_score(self):
+        username = simpledialog.askstring("Enter your username", "Username:")
+        with open("leaderboard.csv", 'a') as f:
+            f.write(f"{username.lower()}, {int(self.score)}, {self.cheated}\n")
+
     def leaderboard(self):
-        pass
+        leaderboard = Toplevel()
+        with open("leaderboard.csv", 'r') as f:
+            scorelist = f.readlines()[1:]
+            print(scorelist)
+        for i, entry in enumerate(scorelist):
+            entry = entry.replace("\n", '').split(", ")
+            entry[1] = int(entry[1])
+            scorelist[i] = entry
+        scorelist.sort(key=lambda x: x[1], reverse=True)
+        title = Label(leaderboard, text="Leaderboard", font=("ArcadeClassic", 36))
+        title.grid(row=0, column=0, columnspan=2)
+        for i in range(10):
+            try:
+                name_l = Label(leaderboard, text=str(scorelist[i][0]), font=('ArcadeClassic', 20))
+                name_l.grid(row=i+1, column=0, sticky='w', padx=20)
+                score_l = Label(leaderboard, text=str(scorelist[i][1]), font=('ArcadeClassic', 20))
+                score_l.grid(row=i+1, column=1, sticky='w', padx=20)
+            except IndexError:
+                pass
+        leaderboard.mainloop()

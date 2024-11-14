@@ -121,6 +121,24 @@ class App():
 
     def leaderboard(self):
         leaderboard = Toplevel()
+        with open("leaderboard.csv", 'r') as f:
+            scorelist = f.readlines()[1:]
+            print(scorelist)
+        for i, entry in enumerate(scorelist):
+            entry = entry.replace("\n", '').split(", ")
+            entry[1] = int(entry[1])
+            scorelist[i] = entry
+        scorelist.sort(key=lambda x: x[1], reverse=True)
+        title = Label(leaderboard, text="Leaderboard", font=("ArcadeClassic", 36))
+        title.grid(row=0, column=0, columnspan=2)
+        for i in range(10):
+            try:
+                name_l = Label(leaderboard, text=str(scorelist[i][0]), font=('ArcadeClassic', 20))
+                name_l.grid(row=i+1, column=0, sticky='w', padx=20)
+                score_l = Label(leaderboard, text=str(scorelist[i][1]), font=('ArcadeClassic', 20))
+                score_l.grid(row=i+1, column=1, sticky='w', padx=20)
+            except IndexError:
+                pass
         leaderboard.mainloop()
 
     
