@@ -10,6 +10,7 @@ from tkinter import ttk, font, messagebox, filedialog
 from PIL import ImageTk, Image
 from random import randint
 from game import Game
+from leaderboard import leaderboard
 import pickle
 
 class App():
@@ -43,7 +44,7 @@ class App():
                     Button(root, text="Settings", command=self.settings, highlightbackground='white'),
                     Button(root, text="How to Play", command=self.tutorial, highlightbackground='white'),
                     Button(root, text="Quit", command=self.menu.destroy, highlightbackground='white'),
-                    Button(root, text="Leaderboard", command=self.leaderboard, highlightbackground='white')
+                    Button(root, text="Leaderboard", command=leaderboard, highlightbackground='white')
         ]
 
         title.grid(column=0, row=0, padx=100)
@@ -95,11 +96,12 @@ class App():
         with open('controls.txt', 'r') as file:
             self.controls = eval(file.read())   # Since the contents of the controls file is a string representation of a dict, we can just unpack with eval
         settings_window = Toplevel()
-        settings_window.resizable(False, False) # Fix the size of the window to not interfere with the physics engine which uses pixels as the distance unit
+        settings_window.resizable(False, False) # Fix the size of the window
         settings_window.title("Settings")
         title = Label(settings_window, text="Settings", font=self.heading_font)
         title.grid(column=0, row=0, columnspan=2, pady=15, padx=15)
 
+        # Initialise and show the combo-select boxes for the two customisable controls
 
         pause_var = StringVar(value=self.controls['pause'])
         self.pause_sel = ttk.Combobox(settings_window, textvariable=pause_var, width=2)
@@ -115,12 +117,17 @@ class App():
         boss_lab.grid(column=0, row=2)
         self.boss_sel.grid(column=1, row=2)
 
+        # Show the save button
+
         save_button = Button(settings_window, text="Save", command=self.save_binds)
         save_button.grid(row=3, columnspan=2)
-        self.settings_window = settings_window
+        self.settings_window = settings_window     # Save the window to allow for deletion after input validation
         settings_window.mainloop()
         
     def save_binds(self):
+        """
+        Validates that keybinds are unique and if so, saves them to an external file
+        """
         pause = self.pause_sel.get()
         boss = self.boss_sel.get()
         if pause != boss:
@@ -132,6 +139,9 @@ class App():
             messagebox.showerror("You cannot set the pause and boss key binds to the same key")
 
     def tutorial(self):
+        """
+        Shows text instructions from the tutorial.txt file
+        """
         tutorial = Toplevel()
         tutorial.geometry("600x200")
         title = Label(tutorial, text="How to Play", font=self.heading_font)
@@ -143,24 +153,3 @@ class App():
                 label.pack()
 
 
-    def leaderboard(self):
-        leaderboard = Toplevel()
-        with open("leaderboard.csv", 'r') as f:
-            scorelist = f.readlines()[1:]
-        for i, entry in enumerate(scorelist):
-            entry = entry.replace("\n", '').split(", ")
-            entry[1] = int(entry[1])
-            scorelist[i] = entry
-        scorelist = [score for score in scorelist if score[2] != 'True']
-        scorelist.sort(key=lambda x: x[1], reverse=True)
-        title = Label(leaderboard, text="Leaderboard", font=self.heading_font)
-        title.grid(row=0, column=0, columnspan=2)
-        for i in range(10):
-            try:
-                name_l = Label(leaderboard, text=str(scorelist[i][0]), font=self.retro_font)
-                name_l.grid(row=i+1, column=0, sticky='w', padx=20)
-                score_l = Label(leaderboard, text=str(scorelist[i][1]), font=self.retro_font)
-                score_l.grid(row=i+1, column=1, sticky='w', padx=20)
-            except IndexError:
-                pass
-        leaderboard.mainloop()

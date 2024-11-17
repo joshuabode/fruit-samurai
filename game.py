@@ -5,6 +5,7 @@ from random import randint, choice, uniform
 from collections import deque
 from fruit import Fruit
 from bomb import Bomb
+from leaderboard import leaderboard
 import pickle
 
 class Game(Canvas):
@@ -147,7 +148,7 @@ class Game(Canvas):
             self.save_window = self.create_window(self.width/2, self.height/2 , anchor='center', window=self.save_button)
             self.resume_button = Button(self, text="Resume", command=lambda: self.pause(None), bg="#f0d7a1", highlightbackground="#f0d7a1")
             self.resume_window = self.create_window(self.width/2, self.height/2 + 30 , anchor='center', window=self.resume_button)
-            self.lead_button = Button(self, text="Leaderboard", command=self.leaderboard, highlightbackground='#f0d7a1')
+            self.lead_button = Button(self, text="Leaderboard", command=leaderboard, highlightbackground='#f0d7a1')
             self.lead_window = self.create_window(self.width/2, self.height/2 + 60, anchor='center', window=self.lead_button)
         
         else:
@@ -187,7 +188,7 @@ class Game(Canvas):
     def game_over(self):
         game_over_label = Label(self, text="Game Over", font=self.heading_font, bg="#f0d7a1", fg='black')
         self.create_window(self.width/2, self.height/2 - 30, anchor='center', window=game_over_label)
-        leaderboard = Button(self, text="Leaderboard", command=self.leaderboard, highlightbackground='#f0d7a1')
+        leaderboard = Button(self, text="Leaderboard", command=leaderboard, highlightbackground='#f0d7a1')
         self.create_window(self.width/2, self.height/2 , anchor='center', window=leaderboard)
         save_score = Button(self, text="Save Score to Leaderboard", command=self.save_score, highlightbackground='#f0d7a1')
         self.create_window(self.width/2, self.height/2 + 30, anchor='center', window=save_score)
@@ -200,28 +201,6 @@ class Game(Canvas):
         username = simpledialog.askstring("Enter your username", "Username:")
         with open("leaderboard.csv", 'a') as f:
             f.write(f"{username.lower()}, {int(self.score)}, {self.cheated}\n")
-
-    def leaderboard(self):
-        leaderboard = Toplevel()
-        with open("leaderboard.csv", 'r') as f:
-            scorelist = f.readlines()[1:]
-        for i, entry in enumerate(scorelist):
-            entry = entry.replace("\n", '').split(", ")
-            entry[1] = int(entry[1])
-            scorelist[i] = entry
-        scorelist = [score for score in scorelist if score[2] != 'True']
-        scorelist.sort(key=lambda x: x[1], reverse=True)
-        title = Label(leaderboard, text="Leaderboard", font=self.heading_font)
-        title.grid(row=0, column=0, columnspan=2)
-        for i in range(10):
-            try:
-                name_l = Label(leaderboard, text=str(scorelist[i][0]), font=self.retro_font)
-                name_l.grid(row=i+1, column=0, sticky='w', padx=20)
-                score_l = Label(leaderboard, text=str(scorelist[i][1]), font=self.retro_font)
-                score_l.grid(row=i+1, column=1, sticky='w', padx=20)
-            except IndexError:
-                pass
-        leaderboard.mainloop()
 
 
 
