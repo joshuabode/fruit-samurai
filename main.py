@@ -12,6 +12,8 @@ class App():
 
     def __init__(self):
         start_window = Tk()
+        start_window.geometry("400x600")
+        start_window.configure(background='white')
         self.retro_font = font.Font(family="ArcadeClassic", size=20)
         self.heading_font = font.Font(family="TkHeadingFont", size=36, weight='bold')
         start_window.title("Fruit Samurai")
@@ -20,22 +22,22 @@ class App():
 
     def init_menu(self):
         root = self.menu
-        img = ImageTk.PhotoImage(image=Image.open('background.png'))
-        image_label = Label(master=root, image=img)
-        image_label.place(x=0, y=0)
-        title = Label(root, text="Fruit Samurai", font=self.heading_font, bg="#bbefe3", fg='black')
+        img = ImageTk.PhotoImage(image=Image.open('background.png').resize((400, 400), Image.Resampling.NEAREST))
+        image_label = Label(master=root, image=img, highlightthickness=0, borderwidth=0)
+        image_label.place(x=0, y=200)
+        title = Label(root, text="Fruit Samurai", font=self.heading_font, bg="white", fg='black')
         buttons = [None for _ in range(6)]
         # b_images = [ImageTk.PhotoImage(image=Image.open("b1.png")),
         #             ImageTk.PhotoImage(image=Image.open("b2.png")),
         #             ImageTk.PhotoImage(image=Image.open("b3.png")),
         #             ImageTk.PhotoImage(image=Image.open("b4.png")),
         #             ImageTk.PhotoImage(image=Image.open("b5a.png")),]
-        buttons[0] = Button(root, text="New Game", command=self.new_game, highlightbackground='#bbefe3')
-        buttons[1] = Button(root, text="Load Game", command=self.load_game, highlightbackground='#bbefe3')
-        buttons[2] = Button(root, text="Settings", command=self.settings, highlightbackground='#bbefe3')
-        buttons[3] = Button(root, text="How to Play", command=self.tutorial, highlightbackground='#bbefe3')
-        buttons[4] = Button(root, text="Quit", command=self.menu.destroy, highlightbackground='#bbefe3')
-        buttons[5] = Button(root, text="Leaderboard", command=self.leaderboard, highlightbackground='#bbefe3')
+        buttons[0] = Button(root, text="New Game", command=self.new_game, highlightbackground='white')
+        buttons[1] = Button(root, text="Load Game", command=self.load_game, highlightbackground='white')
+        buttons[2] = Button(root, text="Settings", command=self.settings, highlightbackground='white')
+        buttons[3] = Button(root, text="How to Play", command=self.tutorial, highlightbackground='white')
+        buttons[4] = Button(root, text="Quit", command=self.menu.destroy, highlightbackground='white')
+        buttons[5] = Button(root, text="Leaderboard", command=self.leaderboard, highlightbackground='white')
         title.grid(column=0, row=0, padx=100)
         for i, button in enumerate(buttons):
             button.grid(column=0, row=i+1)
@@ -109,7 +111,16 @@ class App():
             messagebox.showerror("You cannot set the pause and boss key binds to the same key")
 
     def tutorial(self):
-        pass
+        tutorial = Toplevel()
+        tutorial.geometry("600x200")
+        title = Label(tutorial, text="How to Play", font=("TkHeaadingFont", 36))
+        title.pack()
+        with open("tutorial.txt", 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                label = Label(tutorial, text=line)
+                label.pack()
+
 
     def leaderboard(self):
         leaderboard = Toplevel()
@@ -119,6 +130,7 @@ class App():
             entry = entry.replace("\n", '').split(", ")
             entry[1] = int(entry[1])
             scorelist[i] = entry
+        scorelist = [score for score in scorelist if score[2] != 'True']
         scorelist.sort(key=lambda x: x[1], reverse=True)
         title = Label(leaderboard, text="Leaderboard", font=("ArcadeClassic", 36))
         title.grid(row=0, column=0, columnspan=2)

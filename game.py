@@ -207,6 +207,7 @@ class Game(Canvas):
             entry = entry.replace("\n", '').split(", ")
             entry[1] = int(entry[1])
             scorelist[i] = entry
+        scorelist = [score for score in scorelist if score[2] != 'True']
         scorelist.sort(key=lambda x: x[1], reverse=True)
         title = Label(leaderboard, text="Leaderboard", font=("ArcadeClassic", 36))
         title.grid(row=0, column=0, columnspan=2)
