@@ -1,3 +1,9 @@
+"""
+GAME.PY
+
+Defines the Game object which inherits from Tkinter Canvas.
+"""
+
 from tkinter import *
 from tkinter import font, filedialog, simpledialog
 from PIL import ImageTk, Image

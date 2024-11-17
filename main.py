@@ -2,7 +2,6 @@
 MAIN.PY
 
 Defines the App object
-
 """
 
 from tkinter import *

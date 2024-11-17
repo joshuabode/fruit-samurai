@@ -1,12 +1,21 @@
+"""
+FRUIT.PY
+
+Defines the Fruit object
+"""
+
 from PIL import ImageTk, Image
 
 class Fruit:
     def __init__(self, sprite_coords, coords, velocity, canvas, flip_image=False, shape=False):
+        """
+        Saves input variables as properties and adds the fruit to canvas
+        """
         self.canvas = canvas
         self.height, self.width = canvas.height, canvas.width
-        self.x, self.y = coords
-        self.s_x, self.s_y = sprite_coords
-        self.v_x, self.v_y = velocity
+        self.x, self.y = coords     # Position of the object on the canvas
+        self.s_x, self.s_y = sprite_coords # Numbers encoding the position of the sprite on the sprite sheet
+        self.v_x, self.v_y = velocity # Velocity of the object on the canvas
         self.shape = shape
         self.flip_image = flip_image
         if self.s_x//16 == 26:      # If the fruit is a watermelon, scale the image up slightly
@@ -27,6 +36,11 @@ class Fruit:
         self.tick()
 
     def delete(self, event):
+        """
+        Removes the base fruit from canvas and stops tracking it for the save file.
+        Spawns two chopped fruit halves
+        Alters the game variables lives and streak
+        """
         if not self.canvas.paused:
             self.deleted = True
             self.canvas.streak += 1
@@ -36,15 +50,16 @@ class Fruit:
             self.canvas.score += self.canvas.streak*0.2*max(10, (0.1*(self.canvas.m_vel[0]**2 + self.canvas.m_vel[1]**2)**0.5))
             if not self.shape:
                 # Generates two halves of chopped fruit
-                left = ChoppedFruit((self.s_x, 5*16),
+                left = ChoppedFruit((self.s_x, 5*16),       # The sprite's 
                         (self.canvas.coords(self.object)[0]-16, self.canvas.coords(self.object)[1]),
                         (0.2*self.canvas.m_vel[0]-50, 0.2*self.canvas.m_vel[1]),
                         self.canvas, False)
-                self.canvas.fruits.append(left)
                 right = ChoppedFruit((self.s_x, 5*16),
                         (self.canvas.coords(self.object)[0]+16, self.canvas.coords(self.object)[1]),
                         (0.2*self.canvas.m_vel[0]+50, 0.2*self.canvas.m_vel[1]),
                         self.canvas, True)
+                # Start tracking the chopped halves incase of game save
+                self.canvas.fruits.append(left)
                 self.canvas.fruits.append(right)
                 self.canvas.tag_bind(left.object, "<Enter>", left.delete) 
                 self.canvas.tag_bind(right.object, "<Enter>", right.delete) 
@@ -53,8 +68,11 @@ class Fruit:
             self.canvas.delete(self.object)
     
     def displace(self):
-        # Main physics function which handles collisions with walls and calculates displacenet 
-        # Uses SUVAT equations and Newton's law of restitution
+        """
+        Main physics function which handles collisions with walls and calculates displacenet 
+        Uses SUVAT equations and Newton's law of restitution
+        This function handles game behaviour once the object dissapears below the screen
+        """
         left, top, right, bottom = self.bbox
         self.grounded = bottom >= self.height
         dy, dx = 0, 0
@@ -90,7 +108,9 @@ class Fruit:
 
 
     def tick(self):
-        # This function updates the positino of the fruit
+        """
+        This function updates the position of the object
+        """
         if not self.deleted:
             if self.canvas.paused:
                 pass
@@ -99,13 +119,18 @@ class Fruit:
                 self.bbox = self.canvas.bbox(self.object)
             self.canvas.after(int(1000*self.canvas.dt), self.tick)
 
-    def pack(self) -> str:
+    def pack(self):
+        """
+        This function returns a list of object properties to be pickled into the save file
+        """
         vars = [(self.s_x, self.s_y), (self.x, self.y), (self.v_x, self.v_y), None, self.flip_image, self.shape]
         return vars
             
 
 class ChoppedFruit(Fruit):
-    # Chopped fruit class has a redefined delete function as we dont want an infinite stream of fruit-halves
+    """
+    Chopped fruit class has a redefined delete function as we don't want to keep spawning fruit halves
+    """
     def __init__(self, sprite_coords, coords, velocity, canvas, flip_image):
         super().__init__(sprite_coords, coords, velocity, canvas, flip_image)
 

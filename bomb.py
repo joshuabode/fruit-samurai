@@ -2,7 +2,6 @@
 BOMB.PY
 
 Defines the Bomb object
-
 """
 
 from PIL import Image, ImageTk
@@ -28,7 +27,7 @@ class Bomb:
 
     def delete(self, event):
         """
-        This function removes the bomb from canvas and stops tracking it for the save file.
+        Removes the bomb from canvas and stops tracking it for the save file.
         It also alters the game variables lives and streak
         """
         if not self.canvas.paused:
@@ -46,8 +45,8 @@ class Bomb:
     def displace(self):
         """
         Main physics function which handles collisions with walls and calculates displacenet 
-        Uses SUVAT equations and Newton's law of restitution. This function calls the delete function
-        once the object dissapears below the screen
+        Uses SUVAT equations and Newton's law of restitution. 
+        This function handles game behaviour once the object dissapears below the screen
         """
         left, top, right, bottom = self.bbox
         self.grounded = bottom >= self.height
