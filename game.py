@@ -124,15 +124,19 @@ class Game(Canvas):
         self.paused = not self.paused
         if self.paused:
             self.pause_label = Label(self, text="Paused", font=("ArcadeClassic", 36, 'bold'), bg="#f0d7a1", fg='black')
-            self.pause_text = self.create_window(self.width/2, self.height/2, anchor='center', window=self.pause_label)
+            self.pause_text = self.create_window(self.width/2, self.height/2 -30, anchor='center', window=self.pause_label)
             self.save_button = Button(self, text="Save Game", command=self.save_game, bg="#f0d7a1", highlightbackground="#f0d7a1")
-            self.save_window = self.create_window(self.width/2, self.height/2 + 30 , anchor='center', window=self.save_button)
+            self.save_window = self.create_window(self.width/2, self.height/2 , anchor='center', window=self.save_button)
             self.resume_button = Button(self, text="Resume", command=lambda: self.pause(None), bg="#f0d7a1", highlightbackground="#f0d7a1")
-            self.resume_window = self.create_window(self.width/2, self.height/2 + 60 , anchor='center', window=self.resume_button)
+            self.resume_window = self.create_window(self.width/2, self.height/2 + 30 , anchor='center', window=self.resume_button)
+            self.lead_button = Button(self, text="Leaderboard", command=self.leaderboard, highlightbackground='#f0d7a1')
+            self.lead_window = self.create_window(self.width/2, self.height/2 + 60, anchor='center', window=self.lead_button)
+        
         else:
             self.delete(self.pause_text)
             self.delete(self.save_window)
             self.delete(self.resume_window)
+            self.delete(self.lead_window)
 
     def save_game(self):
         vars = (self.lives, self.score, self.streak, list(self.hit_or_miss), [f.pack() for f in self.fruits])
