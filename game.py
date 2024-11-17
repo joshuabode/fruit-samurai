@@ -194,8 +194,8 @@ class Game(Canvas):
     def game_over(self):
         game_over_label = Label(self, text="Game Over", font=self.heading_font, bg="#f0d7a1", fg='black')
         self.create_window(self.width/2, self.height/2 - 30, anchor='center', window=game_over_label)
-        leaderboard = Button(self, text="Leaderboard", command=leaderboard, highlightbackground='#f0d7a1')
-        self.create_window(self.width/2, self.height/2 , anchor='center', window=leaderboard)
+        lead_button = Button(self, text="Leaderboard", command=leaderboard, highlightbackground='#f0d7a1')
+        self.create_window(self.width/2, self.height/2 , anchor='center', window=lead_button)
         save_score = Button(self, text="Save Score to Leaderboard", command=self.save_score, highlightbackground='#f0d7a1')
         self.create_window(self.width/2, self.height/2 + 30, anchor='center', window=save_score)
         restart = Button(self, text="Exit", command=self.window.destroy, highlightbackground='#f0d7a1')
