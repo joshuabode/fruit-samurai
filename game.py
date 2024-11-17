@@ -1,17 +1,16 @@
 from tkinter import *
-from tkinter import ttk
 from tkinter import filedialog, simpledialog
-from tkinter import font
-from PIL import ImageTk, Image, ImageDraw
+from PIL import ImageTk, Image
 from random import randint, choice, uniform
 from collections import deque
-from fruit import Fruit, ChoppedFruit
+from fruit import Fruit
+from bomb import Bomb
 import pickle
 
 class Game(Canvas):
     def __init__(self, window, w, h, lives=5, score=0, streak=0, hit_or_miss=[None for _ in range(50)]):
-        self.window = window
         super().__init__(master=window, width=w, height=h, background="#f0d7a1", cursor="star")
+        self.window = window
         self.m_x = None             # Holding previous mouse x-position
         self.m_y = None             # Holding previous mouse y-position
         self.m_vel = (None, None)   # Holding mouse velocity
@@ -24,6 +23,7 @@ class Game(Canvas):
         self.width, self.height = w, h   # Size of gameplay area in pixels
         self.fruit_size = 60             # Fruit diameter in pixels 
         self.fruits = []             # List holding the current fruits
+        self.bombs = []
         self.cheating = False            # Boolean values for game states
         self.cheated = False            
         self.paused = False
@@ -51,8 +51,8 @@ class Game(Canvas):
         self.bind("<Motion>", self.mouse_handler)
 
     def update(self):
-        self.interval = interval(self.streak)
-        print(self.interval)
+        if not self.game_ended:
+            self.interval = interval(self.streak)
         try:
             self.delete(min(self.find_withtag("mouse")))
         except ValueError:
@@ -81,25 +81,41 @@ class Game(Canvas):
         elif key.char == self.controls['boss']:
             self.boss_key(key)
 
-
     def new_fruit(self):
+        if self.paused:
+            pass
+        else:
+            fruit = Fruit(  (choice(self.fruit_indicies)*16, 16),
+            (randint(self.fruit_size, self.width-self.fruit_size), self.height-self.fruit_size),
+            (uniform(-3, 3)*self.ppm, uniform(-6.64, -4)*self.ppm), self)
+            self.fruits.append(fruit)
+            if not self.game_ended:
+                self.tag_bind(fruit.object, "<Enter>", fruit.delete)    # Delete fruit when mouse hovers over it
+            # New fruit is projected at a random interval = INTERVAL +/- 0.1 seconds 
+        self.after(max(0, randint(self.interval-100, self.interval+100)), self.new_fruit) 
+
+    def new_bomb(self):
         if not self.game_ended:
             if self.paused:
                 pass
-            else:
-                fruit = Fruit(  (choice(self.fruit_indicies)*16, 16),
-                (randint(self.fruit_size, self.width-self.fruit_size), self.height-self.fruit_size),
-                (uniform(-3, 3)*self.ppm, uniform(-6.64, -4)*self.ppm), self)
-                self.fruits.append(fruit)
-                self.tag_bind(fruit.object, "<Enter>", fruit.delete)    # Delete fruit when mouse hovers over it
-                # New fruit is projected at a random interval = INTERVAL +/- 0.1 seconds 
+            elif self.score > 1_000:  # Only spawn bombs if the player scores above 1,000
+                bomb = Bomb((randint(self.fruit_size, self.width-self.fruit_size), self.height-self.fruit_size), (uniform(-3, 3)*self.ppm, uniform(-6.64, -4)*self.ppm), self)
+                self.tag_bind(bomb.object, "<Enter>", bomb.delete)    # Delete fruit when mouse hovers over it
+                # New bomb is projected approximately once per five fruits 
                 
-            self.after(max(0, randint(self.interval-100, self.interval+100)), self.new_fruit) 
+            self.after(max(0, 5*randint(self.interval-100, self.interval+100)), self.new_bomb) 
+
 
     def old_fruit(self, args):    
         fruit = Fruit(*args)
         self.fruits.append(fruit)
         self.tag_bind(fruit.object, "<Enter>", fruit.delete) 
+
+    def old_bomb(self, args):
+        bomb = Bomb(*args)
+        self.bombs.append(bomb)
+        self.tag_bind(bomb.object, "<Enter>", bomb.delete) 
+
 
     def mouse_handler(self, event):
         # Calculates the mouse velocity using numerical differentiation: v = dx/dt
@@ -138,8 +154,9 @@ class Game(Canvas):
             self.delete(self.resume_window)
             self.delete(self.lead_window)
 
+
     def save_game(self):
-        vars = (self.lives, self.score, self.streak, list(self.hit_or_miss), [f.pack() for f in self.fruits])
+        vars = (self.lives, self.score, self.streak, list(self.hit_or_miss), [f.pack() for f in self.fruits], [b.pack() for b in self.bombs])
         file = filedialog.asksaveasfile('wb', defaultextension=".sav")
         pickle.dump(vars, file)
         file.close()
@@ -167,13 +184,14 @@ class Game(Canvas):
 
     def game_over(self):
         game_over_label = Label(self, text="Game Over", font=("ArcadeClassic", 36, 'bold'), bg="#f0d7a1", fg='black')
-        self.create_window(self.width/2, self.height/2, anchor='center', window=game_over_label)
+        self.create_window(self.width/2, self.height/2 - 30, anchor='center', window=game_over_label)
         leaderboard = Button(self, text="Leaderboard", command=self.leaderboard, highlightbackground='#f0d7a1')
-        self.create_window(self.width/2, self.height/2 + 30, anchor='center', window=leaderboard)
+        self.create_window(self.width/2, self.height/2 , anchor='center', window=leaderboard)
         save_score = Button(self, text="Save Score to Leaderboard", command=self.save_score, highlightbackground='#f0d7a1')
-        self.create_window(self.width/2, self.height/2 + 60, anchor='center', window=save_score)
-        for _ in range(10):
-            self.new_fruit()
+        self.create_window(self.width/2, self.height/2 + 30, anchor='center', window=save_score)
+        restart = Button(self, text="Exit", command=self.window.destroy, highlightbackground='#f0d7a1')
+        self.create_window(self.width/2, self.height/2+60, anchor='center', window=restart)
+        self.interval = 200
         self.game_ended = True
 
     def save_score(self):
@@ -185,7 +203,6 @@ class Game(Canvas):
         leaderboard = Toplevel()
         with open("leaderboard.csv", 'r') as f:
             scorelist = f.readlines()[1:]
-            print(scorelist)
         for i, entry in enumerate(scorelist):
             entry = entry.replace("\n", '').split(", ")
             entry[1] = int(entry[1])

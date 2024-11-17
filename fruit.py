@@ -1,5 +1,4 @@
 from PIL import ImageTk, Image
-from random import choice
 
 class Fruit:
     def __init__(self, sprite_coords, coords, velocity, canvas, flip_image=False, shape=False):
@@ -10,25 +9,19 @@ class Fruit:
         self.v_x, self.v_y = velocity
         self.shape = shape
         self.flip_image = flip_image
-        if not shape:
-            if self.s_x//16 == 26:      # If the fruit is a watermelon, scale the image up slightly
-                scale = 1.5
-            else:
-                scale = 1
-            self.sprite = canvas.sprite_sheet.crop((self.s_x, self.s_y, self.s_x+16, self.s_y+16))
-            self.sprite = self.sprite.resize((int(self.canvas.fruit_size*scale), 
-                                            int(self.canvas.fruit_size*scale)), 
-                                            Image.Resampling.NEAREST)
-            if flip_image:
-                self.sprite = self.sprite.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
-
-            self.image = ImageTk.PhotoImage(master=self.canvas, image=self.sprite)
-            self.object = canvas.create_image(self.x, self.y, image=self.image, anchor='center')
+        if self.s_x//16 == 26:      # If the fruit is a watermelon, scale the image up slightly
+            scale = 1.5
         else:
-            fruit_shapes = [canvas.create_oval(self.x, self.y, self.x+50, self.y+50, fill="red", outline="red"),
-                            canvas.create_oval(self.x, self.y, self.x+50, self.y+50, fill="yellow", outline="yellow"),
-                            canvas.create_oval(self.x, self.y, self.x+50, self.y+50, fill="brown", outline="brown")]
-            self.object = choice(fruit_shapes) 
+            scale = 1
+        self.sprite = canvas.sprite_sheet.crop((self.s_x, self.s_y, self.s_x+16, self.s_y+16))
+        self.sprite = self.sprite.resize((int(self.canvas.fruit_size*scale), 
+                                        int(self.canvas.fruit_size*scale)), 
+                                        Image.Resampling.NEAREST)
+        if flip_image:
+            self.sprite = self.sprite.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+
+        self.image = ImageTk.PhotoImage(master=self.canvas, image=self.sprite)
+        self.object = canvas.create_image(self.x, self.y, image=self.image, anchor='center')
         self.bbox = self.canvas.bbox(self.object)
         self.deleted = False
         self.tick()
@@ -82,8 +75,9 @@ class Fruit:
                 self.canvas.streak = 0
                 self.canvas.hit_or_miss.append(False)
                 self.canvas.lives -= 1
-                self.canvas.configure(bg="red")
-                self.canvas.after(100, lambda: self.canvas.configure(bg="#f0d7a1"))
+                if not self.canvas.game_ended:
+                    self.canvas.configure(bg="red")
+                    self.canvas.after(250, lambda: self.canvas.configure(bg="#f0d7a1"))
             self.deleted = True
             self.canvas.fruits.remove(self)
         if not(self.grounded and self.canvas.cheating):
