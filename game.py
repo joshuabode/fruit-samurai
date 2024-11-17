@@ -15,7 +15,7 @@ from leaderboard import leaderboard
 import pickle
 
 class Game(Canvas):
-    def __init__(self, window, w, h, lives=5, score=0, streak=0, hit_or_miss=[None for _ in range(50)]):
+    def __init__(self, window, w, h, lives=5, score=0, streak=0, hit_or_miss=None):
         super().__init__(master=window, width=w, height=h, background="#f0d7a1", cursor="star")
         self.window = window
         self.m_x = None             # Holding previous mouse x-position
@@ -41,13 +41,15 @@ class Game(Canvas):
                         13, 17, 18, 19, 
                         21, 22, 23, 26, 37]
         self.key_history = deque([], 8)      # Double-ended queue acting as memory to check for the cheatcode
-        self.hit_or_miss = deque(hit_or_miss, maxlen=50)    # Double-ended queue used to calculate rolling accuracy to dynamically update difficulty
+        if hit_or_miss is None:
+            self.hit_or_miss = deque([None for _ in range(50)], maxlen=50)    # Double-ended queue used to calculate rolling accuracy to dynamically update difficulty
+        else:
+            self.hit_or_miss = deque(hit_or_miss, maxlen=50)
         self.lives = lives
         self.score = score
         self.streak = streak
         self.retro_font = font.Font(family="ArcadeClassic", size=20)
         self.heading_font = font.Font(family='TkHeadingFont', size=36, weight='bold')
-        self.heading_font
         self.lv_content = Label(self, text=f"Lives: {self.lives}", bg="#f0d7a1", font=self.retro_font, fg='black')
         self.sc_content = Label(self, text=f"Score: {self.score}", bg="#f0d7a1", font=self.retro_font, fg='black')
         self.st_content = Label(self, text=f"Streak: {self.streak}", bg="#f0d7a1", font=self.retro_font, fg='black')
@@ -77,11 +79,6 @@ class Game(Canvas):
                     self.game_over()
                 
             self.after(20, self.update)
-
-    def create_label(self, text, x, y, anchor):
-        label = Label(self.window, text=text, font=self.font)
-        self.object = self.create_window(x, y, anchor=anchor, window=label)
-        return label
 
     def key_in(self, key):
         self.check_cheat(key)

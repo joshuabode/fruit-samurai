@@ -4,13 +4,13 @@ MAIN.PY
 Defines the App object
 """
 
+import pickle
+from random import randint
 from tkinter import *
 from tkinter import ttk, font, messagebox, filedialog
 from PIL import ImageTk, Image
-from random import randint
 from game import Game
 from leaderboard import leaderboard
-import pickle
 
 class App():
 

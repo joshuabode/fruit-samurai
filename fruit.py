@@ -11,6 +11,7 @@ class Fruit:
         """
         Saves input variables as properties and adds the fruit to canvas
         """
+        self.grounded = False
         self.canvas = canvas
         self.height, self.width = canvas.height, canvas.width
         self.x, self.y = coords     # Position of the object on the canvas
@@ -58,7 +59,7 @@ class Fruit:
                         (self.canvas.coords(self.object)[0]+16, self.canvas.coords(self.object)[1]),
                         (0.2*self.canvas.m_vel[0]+50, 0.2*self.canvas.m_vel[1]),
                         self.canvas, True)
-                # Start tracking the chopped halves incase of game save
+                # Start tracking the chopped halves in case of game save
                 self.canvas.fruits.append(left)
                 self.canvas.fruits.append(right)
                 self.canvas.tag_bind(left.object, "<Enter>", left.delete) 
@@ -104,7 +105,7 @@ class Fruit:
         dy += self.v_y*self.canvas.dt
         self.x += dx
         self.y += dy
-        return (dx, dy)
+        return dx, dy
 
 
     def tick(self):
@@ -123,9 +124,7 @@ class Fruit:
         """
         This function returns a list of object properties to be pickled into the save file
         """
-        vars = [(self.s_x, self.s_y), (self.x, self.y), (self.v_x, self.v_y), None, self.flip_image, self.shape]
-        return vars
-            
+        return [(self.s_x, self.s_y), (self.x, self.y), (self.v_x, self.v_y), None, self.flip_image, self.shape]
 
 class ChoppedFruit(Fruit):
     """

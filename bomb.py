@@ -10,6 +10,7 @@ class Bomb:
         """
         Saves input variables as properties and adds the bomb to canvas
         """
+        self.grounded = False
         self.canvas = canvas
         self.height, self.width = canvas.height, canvas.width
         self.x, self.y = coords
@@ -25,7 +26,7 @@ class Bomb:
         self.canvas.bombs.append(self)      # Save the bomb to the game object so it can be retrieved from a save file
         self.tick()                         # Start the loop to move the bomb
 
-    def delete(self, event):
+    def delete(self, _):
         """
         Removes the bomb from canvas and stops tracking it for the save file.
         It also alters the game variables lives and streak
@@ -46,7 +47,7 @@ class Bomb:
         """
         Main physics function which handles collisions with walls and calculates displacenet 
         Uses SUVAT equations and Newton's law of restitution. 
-        This function handles game behaviour once the object dissapears below the screen
+        This function handles game behaviour once the object disappears below the screen
         """
         left, top, right, bottom = self.bbox
         self.grounded = bottom >= self.height
@@ -72,7 +73,7 @@ class Bomb:
         dy += self.v_y*self.canvas.dt
         self.x += dx
         self.y += dy
-        return (dx, dy)
+        return dx, dy
 
     def tick(self):
         """
@@ -90,6 +91,4 @@ class Bomb:
         """
         This function returns a list of object properties to be pickled into the save file
         """
-        vars = [(self.x, self.y), (self.v_x, self.v_y), None]
-        return vars
-            
+        return [(self.x, self.y), (self.v_x, self.v_y), None]
