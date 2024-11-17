@@ -1,16 +1,23 @@
+"""
+MAIN.PY
+
+Defines the App object
+
+"""
+
 from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox, filedialog
-from tkinter import font
+from tkinter import ttk, font, messagebox, filedialog
 from PIL import ImageTk, Image
 from random import randint
 from game import Game
 import pickle
 
 class App():
-    # TODO: Add the initial game menu
 
     def __init__(self):
+        """
+        Outputs the skeleton of the main menu window
+        """
         start_window = Tk()
         start_window.geometry("400x600")
         start_window.configure(background='white')
@@ -21,60 +28,74 @@ class App():
         self.init_menu()
 
     def init_menu(self):
+        """
+        Draws the start screen
+        """
         root = self.menu
         img = ImageTk.PhotoImage(image=Image.open('background.png').resize((400, 400), Image.Resampling.NEAREST))
         image_label = Label(master=root, image=img, highlightthickness=0, borderwidth=0)
         image_label.place(x=0, y=200)
         title = Label(root, text="Fruit Samurai", font=self.heading_font, bg="white", fg='black')
-        buttons = [None for _ in range(6)]
-        # b_images = [ImageTk.PhotoImage(image=Image.open("b1.png")),
-        #             ImageTk.PhotoImage(image=Image.open("b2.png")),
-        #             ImageTk.PhotoImage(image=Image.open("b3.png")),
-        #             ImageTk.PhotoImage(image=Image.open("b4.png")),
-        #             ImageTk.PhotoImage(image=Image.open("b5a.png")),]
-        buttons[0] = Button(root, text="New Game", command=self.new_game, highlightbackground='white')
-        buttons[1] = Button(root, text="Load Game", command=self.load_game, highlightbackground='white')
-        buttons[2] = Button(root, text="Settings", command=self.settings, highlightbackground='white')
-        buttons[3] = Button(root, text="How to Play", command=self.tutorial, highlightbackground='white')
-        buttons[4] = Button(root, text="Quit", command=self.menu.destroy, highlightbackground='white')
-        buttons[5] = Button(root, text="Leaderboard", command=self.leaderboard, highlightbackground='white')
+        # Generate the buttons
+        buttons = [
+                    Button(root, text="New Game", command=self.new_game, highlightbackground='white'),
+                    Button(root, text="Load Game", command=self.load_game, highlightbackground='white'),
+                    Button(root, text="Settings", command=self.settings, highlightbackground='white'),
+                    Button(root, text="How to Play", command=self.tutorial, highlightbackground='white'),
+                    Button(root, text="Quit", command=self.menu.destroy, highlightbackground='white'),
+                    Button(root, text="Leaderboard", command=self.leaderboard, highlightbackground='white')
+        ]
+
         title.grid(column=0, row=0, padx=100)
+        # Display the buttons
         for i, button in enumerate(buttons):
             button.grid(column=0, row=i+1)
         root.mainloop()
 
+    def load_game(self):
+        """
+        Parses save file data and then passes it to the new_game function
+        """
+        file = filedialog.askopenfile(mode='rb')
+        self.new_game(pickle.load(file))
+
     def new_game(self, game_data=None):
+        """
+        Initialises a game/canvas objects or loads a game from data
+        """
         game_window = Toplevel()
         game_window.title("Fruit Samurai")
         game_window.resizable(False, False)
         w, h = 960, 540
-        if game_data:
-            self.main_game = Game(game_window, w, h, *game_data[:-2])
-            for fruit in game_data[-2]:
-               fruit[3] = self.main_game
-               self.main_game.old_fruit(fruit) 
-            self.main_game.after(max(0, randint(self.main_game.interval-100, self.main_game.interval+100)), self.main_game.new_fruit) 
-            for bomb in game_data[-1]:
-                bomb[2] = self.main_game
-                self.main_game.old_bomb(bomb)
-        else:
+        if not game_data:
             self.main_game = Game(game_window, w, h)
             self.main_game.new_fruit()
             self.main_game.new_bomb() 
+        else:    # This block is executed when a game is loaded
+            self.main_game = Game(game_window, w, h, *game_data[:-2])   # Trim the fruits and bombs from the saved data and pass the rest to the Game genetor
+            for fruit in game_data[4]:      # game_data[4] is the list of fruit data from the game data
+               fruit[3] = self.main_game
+               self.main_game.old_fruit(fruit) 
+            for bomb in game_data[5]:      # game_data[5] is the list of bomb data from the game data
+                bomb[2] = self.main_game
+                self.main_game.old_bomb(bomb)
+            # Restart the spawn loops for fruits and bombs
+            self.main_game.after(max(0, randint(self.main_game.interval-100, self.main_game.interval+100)), self.main_game.new_fruit) 
+            self.main_game.after(max(0, 5*randint(self.main_game.interval-100, self.main_game.interval+100)), self.main_game.new_fruit)
         game_window.bind("<Key>", self.main_game.key_in)
         self.main_game.pack()
         self.game_window = game_window
         game_window.mainloop()
 
-    def load_game(self):
-        file = filedialog.askopenfile(mode='rb')
-        self.new_game(pickle.load(file))
     
     def settings(self):
+        """
+        Initialises the settings window
+        """
         with open('controls.txt', 'r') as file:
-            self.controls = eval(file.read())
+            self.controls = eval(file.read())   # Since the contents of the controls file is a string representation of a dict, we can just unpack with eval
         settings_window = Toplevel()
-        settings_window.resizable(False, False)
+        settings_window.resizable(False, False) # Fix the size of the window to not interfere with the physics engine which uses pixels as the distance unit
         settings_window.title("Settings")
         title = Label(settings_window, text="Settings", font=self.heading_font)
         title.grid(column=0, row=0, columnspan=2, pady=15, padx=15)
@@ -113,7 +134,7 @@ class App():
     def tutorial(self):
         tutorial = Toplevel()
         tutorial.geometry("600x200")
-        title = Label(tutorial, text="How to Play", font=("TkHeaadingFont", 36))
+        title = Label(tutorial, text="How to Play", font=self.heading_font)
         title.pack()
         with open("tutorial.txt", 'r') as f:
             lines = f.readlines()
@@ -132,13 +153,13 @@ class App():
             scorelist[i] = entry
         scorelist = [score for score in scorelist if score[2] != 'True']
         scorelist.sort(key=lambda x: x[1], reverse=True)
-        title = Label(leaderboard, text="Leaderboard", font=("ArcadeClassic", 36))
+        title = Label(leaderboard, text="Leaderboard", font=self.heading_font)
         title.grid(row=0, column=0, columnspan=2)
         for i in range(10):
             try:
-                name_l = Label(leaderboard, text=str(scorelist[i][0]), font=('ArcadeClassic', 20))
+                name_l = Label(leaderboard, text=str(scorelist[i][0]), font=self.retro_font)
                 name_l.grid(row=i+1, column=0, sticky='w', padx=20)
-                score_l = Label(leaderboard, text=str(scorelist[i][1]), font=('ArcadeClassic', 20))
+                score_l = Label(leaderboard, text=str(scorelist[i][1]), font=self.retro_font)
                 score_l.grid(row=i+1, column=1, sticky='w', padx=20)
             except IndexError:
                 pass

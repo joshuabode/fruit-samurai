@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import filedialog, simpledialog
+from tkinter import font, filedialog, simpledialog
 from PIL import ImageTk, Image
 from random import randint, choice, uniform
 from collections import deque
@@ -38,10 +38,12 @@ class Game(Canvas):
         self.lives = lives
         self.score = score
         self.streak = streak
-        self.font = ("arcade.ttf", 20, 'bold')
-        self.lv_content = Label(self, text=f"Lives: {self.lives}", bg="#f0d7a1", font=("ArcadeClassic", 24, 'bold'), fg='black')
-        self.sc_content = Label(self, text=f"Score: {self.score}", bg="#f0d7a1", font=("ArcadeClassic", 24, 'bold'), fg='black')
-        self.st_content = Label(self, text=f"Streak: {self.streak}", bg="#f0d7a1", font=("ArcadeClassic", 24, 'bold'), fg='black')
+        self.retro_font = font.Font(family="ArcadeClassic", size=20)
+        self.heading_font = font.Font(family='TkHeadingFont', size=36, weight='bold')
+        self.heading_font
+        self.lv_content = Label(self, text=f"Lives: {self.lives}", bg="#f0d7a1", font=self.retro_font, fg='black')
+        self.sc_content = Label(self, text=f"Score: {self.score}", bg="#f0d7a1", font=self.retro_font, fg='black')
+        self.st_content = Label(self, text=f"Streak: {self.streak}", bg="#f0d7a1", font=self.retro_font, fg='black')
         self.lives_text = self.create_window(10, 10, anchor='nw', window=self.lv_content)         
         self.score_text = self.create_window(self.width/2, 10, anchor='n', window=self.sc_content)
         self.streak_text = self.create_window(self.width - 10, 10, anchor='ne', window=self.st_content)
@@ -139,7 +141,7 @@ class Game(Canvas):
     def pause(self, key):
         self.paused = not self.paused
         if self.paused:
-            self.pause_label = Label(self, text="Paused", font=("ArcadeClassic", 36, 'bold'), bg="#f0d7a1", fg='black')
+            self.pause_label = Label(self, text="Paused", font=self.heading_font, bg="#f0d7a1", fg='black')
             self.pause_text = self.create_window(self.width/2, self.height/2 -30, anchor='center', window=self.pause_label)
             self.save_button = Button(self, text="Save Game", command=self.save_game, bg="#f0d7a1", highlightbackground="#f0d7a1")
             self.save_window = self.create_window(self.width/2, self.height/2 , anchor='center', window=self.save_button)
@@ -183,7 +185,7 @@ class Game(Canvas):
             self.boss_window.destroy()
 
     def game_over(self):
-        game_over_label = Label(self, text="Game Over", font=("ArcadeClassic", 36, 'bold'), bg="#f0d7a1", fg='black')
+        game_over_label = Label(self, text="Game Over", font=self.heading_font, bg="#f0d7a1", fg='black')
         self.create_window(self.width/2, self.height/2 - 30, anchor='center', window=game_over_label)
         leaderboard = Button(self, text="Leaderboard", command=self.leaderboard, highlightbackground='#f0d7a1')
         self.create_window(self.width/2, self.height/2 , anchor='center', window=leaderboard)
@@ -209,13 +211,13 @@ class Game(Canvas):
             scorelist[i] = entry
         scorelist = [score for score in scorelist if score[2] != 'True']
         scorelist.sort(key=lambda x: x[1], reverse=True)
-        title = Label(leaderboard, text="Leaderboard", font=("ArcadeClassic", 36))
+        title = Label(leaderboard, text="Leaderboard", font=self.heading_font)
         title.grid(row=0, column=0, columnspan=2)
         for i in range(10):
             try:
-                name_l = Label(leaderboard, text=str(scorelist[i][0]), font=('ArcadeClassic', 20))
+                name_l = Label(leaderboard, text=str(scorelist[i][0]), font=self.retro_font)
                 name_l.grid(row=i+1, column=0, sticky='w', padx=20)
-                score_l = Label(leaderboard, text=str(scorelist[i][1]), font=('ArcadeClassic', 20))
+                score_l = Label(leaderboard, text=str(scorelist[i][1]), font=self.retro_font)
                 score_l.grid(row=i+1, column=1, sticky='w', padx=20)
             except IndexError:
                 pass
