@@ -183,7 +183,8 @@ class Game(Canvas):
             canvas.pack(expand=True)
             canvas.create_image(0, 0, image=img, anchor='nw')
             self.boss_window.bind("<Key-b>", self.boss_key)
-            self.pause(key)
+           	if not self.paused:
+				self.pause(key)
             self.boss_window.mainloop()
         else:
             self.boss_window.destroy()

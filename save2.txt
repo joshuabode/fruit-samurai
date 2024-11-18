@@ -1,0 +1,1 @@
+(1, 3888.2745958238584, 0, [False, True, True, True, True, True, True, True, True, False])
