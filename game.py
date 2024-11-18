@@ -16,6 +16,9 @@ import pickle
 
 class Game(Canvas):
     def __init__(self, window, w, h, lives=5, score=0, streak=0, hit_or_miss=None):
+        """
+        Initialise game variables and initialise the canvas windows for lives, streak and score
+        """
         super().__init__(master=window, width=w, height=h, background="#f0d7a1", cursor="star")
         self.window = window
         self.m_x = None             # Holding previous mouse x-position
@@ -62,6 +65,9 @@ class Game(Canvas):
         self.bind("<Motion>", self.mouse_handler)
 
     def update(self):
+        """
+        
+        """
         if not self.game_ended:
             self.interval = interval(self.streak)
         try:
@@ -138,7 +144,7 @@ class Game(Canvas):
         if ''.join(self.key_history) == 'LeftRightLeftRightLeftRightDownDown':
             self.cheating = not self.cheating
             self.cheated = True
-        elif ''.join(self.key_history) == 'LeftUpRightUpUpUp':
+        elif 'LeftUpRightUpUpUp' in ''.join(self.key_history):
             self.g = 4
             self.cheated = True
 
@@ -183,8 +189,8 @@ class Game(Canvas):
             canvas.pack(expand=True)
             canvas.create_image(0, 0, image=img, anchor='nw')
             self.boss_window.bind("<Key-b>", self.boss_key)
-           	if not self.paused:
-				self.pause(key)
+            if not self.paused:
+                self.pause(key)
             self.boss_window.mainloop()
         else:
             self.boss_window.destroy()

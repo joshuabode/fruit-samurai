@@ -42,8 +42,8 @@ class Fruit:
         Spawns two chopped fruit halves
         Alters the game variables lives and streak
         """
+        self.deleted = True
         if not self.canvas.paused:
-            self.deleted = True
             self.canvas.streak += 1
             if self.s_x//16 == 2:
                 self.canvas.lives += 1
