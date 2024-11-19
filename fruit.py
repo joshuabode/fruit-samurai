@@ -86,7 +86,7 @@ class Fruit:
         if top <= 0:
             self.v_y = -self.v_y*self.canvas.e
             dy = -top
-        if self.canvas.cheating and self.grounded:
+        if self.canvas.floor_cheat and self.grounded:
             self.v_y = -self.v_y*self.canvas.e
             dy = -(bottom-self.height)
         if top >= self.height:
@@ -99,7 +99,7 @@ class Fruit:
                     self.canvas.after(250, lambda: self.canvas.configure(bg="#f0d7a1"))
             self.deleted = True
             self.canvas.fruits.remove(self)
-        if not(self.grounded and self.canvas.cheating):
+        if not(self.grounded and self.canvas.floor_cheat):
             self.v_y += self.canvas.g*self.canvas.ppm*self.canvas.dt
         dx += self.v_x*self.canvas.dt
         dy += self.v_y*self.canvas.dt

@@ -65,7 +65,6 @@ class App():
         """
         game_window = Toplevel()
         game_window.title("Fruit Samurai")
-        game_window.resizable(False, False)
         w, h = 960, 540
         if not game_data:
             self.main_game = Game(game_window, w, h)

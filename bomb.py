@@ -14,7 +14,7 @@ class Bomb:
         self.canvas = canvas
         self.height, self.width = canvas.height, canvas.width
         self.x, self.y = coords
-        self.v_x, self.v_y = velocity
+        self.velocity_x, self.velocity_y = velocity
         self.sprite = Image.open("bomb.png")
         self.sprite = self.sprite.resize((int(self.canvas.fruit_size), 
                                             int(self.canvas.fruit_size)), 
@@ -47,30 +47,30 @@ class Bomb:
         """
         Main physics function which handles collisions with walls and calculates displacenet 
         Uses SUVAT equations and Newton's law of restitution. 
-        This function handles game behaviour once the object disappears below the screen
+        Deletes the object when it falls below the screen
         """
         left, top, right, bottom = self.bbox
         self.grounded = bottom >= self.height
         dy, dx = 0, 0
         if left <= 0:
-            self.v_x = -self.v_x*self.canvas.e
+            self.velocity_x = -self.velocity_x*self.canvas.e
             dx = -left
         if right >= self.width:
-            self.v_x = -self.v_x*self.canvas.e
+            self.velocity_x = -self.velocity_x*self.canvas.e
             dx = -(right-self.width)
         if top <= 0:
-            self.v_y = -self.v_y*self.canvas.e
+            self.velocity_y = -self.velocity_y*self.canvas.e
             dy = -top
-        if self.canvas.cheating and self.grounded:
-            self.v_y = -self.v_y*self.canvas.e
+        if self.canvas.floor_cheat and self.grounded:
+            self.velocity_y = -self.velocity_y*self.canvas.e
             dy = -(bottom-self.height)
         if top >= self.height:
             self.deleted = True
             self.canvas.delete(self.object)
-        if not(self.grounded and self.canvas.cheating):
-            self.v_y += self.canvas.g*self.canvas.ppm*self.canvas.dt
-        dx += self.v_x*self.canvas.dt
-        dy += self.v_y*self.canvas.dt
+        if not(self.grounded and self.canvas.floor_cheat):
+            self.velocity_y += self.canvas.g*self.canvas.ppm*self.canvas.dt
+        dx += self.velocity_x*self.canvas.dt
+        dy += self.velocity_y*self.canvas.dt
         self.x += dx
         self.y += dy
         return dx, dy
@@ -91,4 +91,4 @@ class Bomb:
         """
         This function returns a list of object properties to be pickled into the save file
         """
-        return [(self.x, self.y), (self.v_x, self.v_y), None]
+        return [(self.x, self.y), (self.velocity_x, self.velocity_y), None]
