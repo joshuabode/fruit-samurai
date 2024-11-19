@@ -25,8 +25,7 @@ class Game(Canvas):
         self.background_color = "#f0d7a1"
         self.mouse_trail_color = "#eddfc5"
         self.retro_font = font.Font(family="ArcadeClassic", size=20)
-        self.heading_font = font.Font(
-            family="TkHeadingFont", size=36, weight='bold')
+        self.heading_font = font.Font(family="TkHeadingFont", size=36, weight='bold')
         super().__init__(master=window, width=w, height=h,
                          background=self.background_color, cursor="star")
         self.window = window
@@ -188,9 +187,9 @@ class Game(Canvas):
             elif self.score > 5_000:
                 bomb = Bomb(
                     (randint(self.fruit_size, self.width - self.fruit_size),
-                     self.height - self.fruit_size),
-                    (uniform(-3, 3) * self.ppm, uniform(-6, -4) * self.ppm),
-                    self)
+                     self.height - self.fruit_size), 
+                     (uniform(-3, 3) * self.ppm, uniform(-6, -4) * self.ppm),
+                     self)
                 # Delete bomb when mouse hovers over it
                 self.tag_bind(bomb.object, "<Enter>", bomb.delete)
                 # New bomb is projected approximately once per five fruits
@@ -232,16 +231,16 @@ class Game(Canvas):
         random_int = randint(0, 1)
         if random_int:
             self.create_oval(self.m_x, self.m_y, self.m_x + 10,
-                             self.m_y + 10,
+                             self.m_y + 10, 
                              fill=self.mouse_trail_color,
                              outline=self.mouse_trail_color,
                              tags=("mouse"))
         else:
             self.create_rectangle(self.m_x, self.m_y, self.m_x + 10,
-                                  self.m_y + 10,
-                                  fill=self.mouse_trail_color,
-                                  outline=self.mouse_trail_color,
-                                  tags=("mouse"))
+                                    self.m_y + 10, 
+                                    fill=self.mouse_trail_color,
+                                    outline=self.mouse_trail_color,
+                                    tags=("mouse"))
         # If we just generated the 26th element of the mouse trial,
         # delete the oldest element.
         while len(self.find_withtag("mouse")) > 25:
@@ -257,7 +256,7 @@ class Game(Canvas):
         if ''.join(self.key_history) == 'LeftRightLeftRightLeftRightDownDown':
             self.floor_cheat = not self.floor_cheat
             self.cheated = True
-        # This cheatcode reduces gravity and scales down velocity to reduce
+        # This cheatcode reduces gravity and scales down velocity to reduce 
         # the number of fruits bouncing off of the ceiling
         elif 'LeftUpRightUpUpUp' in ''.join(self.key_history):
             self.g = 1
@@ -276,7 +275,7 @@ class Game(Canvas):
 
     def pause(self, key):
         """
-        The function to pause and unpause the game. It draws/deletes the
+        The function to pause and unpause the game. It draws/deletes the 
         relevant labels and buttons to the screen
         """
         self.paused = not self.paused
@@ -285,28 +284,27 @@ class Game(Canvas):
                 self, text="Paused", font=self.heading_font,
                 bg=self.background_color, fg='black')
             self.pause_text = self.create_window(
-                self.width / 2, self.height / 2 - 30, anchor='center',
+                self.width / 2, self.height / 2 - 30, anchor='center', 
                 window=self.pause_label)
             self.save_button = Button(
-                self, text="Save Game", command=self.save_game,
-                bg=self.background_color,
+                self, text="Save Game", command=self.save_game, 
+                bg=self.background_color, 
                 highlightbackground=self.background_color)
             self.save_window = self.create_window(
-                self.width / 2, self.height / 2, anchor='center',
+                self.width / 2, self.height / 2, anchor='center', 
                 window=self.save_button)
-            self.resume_button = Button(
-                self, text="Resume",
-                command=lambda: self.pause(None),
-                bg=self.background_color,
+            self.resume_button = Button(self, text="Resume", 
+                command=lambda: self.pause(None), 
+                bg=self.background_color, 
                 highlightbackground=self.background_color)
             self.resume_window = self.create_window(
-                self.width / 2, self.height / 2 + 30, anchor='center',
+                self.width / 2, self.height / 2 + 30, anchor='center', 
                 window=self.resume_button)
             self.lead_button = Button(
-                self, text="Leaderboard", command=leaderboard,
+                self, text="Leaderboard", command=leaderboard, 
                 highlightbackground='#f0d7a1')
             self.lead_window = self.create_window(
-                self.width / 2, self.height / 2 + 60, anchor='center',
+                self.width / 2, self.height / 2 + 60, anchor='center', 
                 window=self.lead_button)
 
         else:
@@ -317,21 +315,17 @@ class Game(Canvas):
 
     def save_game(self):
         """
-        Saves the game by pickling a list of variables including fruit
+        Saves the game by pickling a list of variables including fruit 
         and bomb data
         """
-        vars = (self.lives, self.score, self.streak, list(self.hit_or_miss),
-                [f.pack() for f in self.fruits],
+        vars = (self.lives, self.score, self.streak, list(self.hit_or_miss), 
+                [f.pack() for f in self.fruits], 
                 [b.pack() for b in self.bombs])
         file = filedialog.asksaveasfile('wb', defaultextension=".sav")
         pickle.dump(vars, file)
         file.close()
 
     def boss_key(self, key):
-        """
-        Function which is run once the boss key is pressed. It creates a new
-        window and displays a screenshot of a spreadsheet.
-        """
         self.boss_keyed = not self.boss_keyed
         if self.boss_keyed:
             w = self.window.winfo_screenwidth()
@@ -342,13 +336,12 @@ class Game(Canvas):
             canvas = Canvas(self.boss_window,
                             width=w,
                             height=h)
-            screenshot = Image.open("boss.jpg")
-            screenshot = screenshot.resize((w, h), Image.Resampling.BICUBIC)
-            img = ImageTk.PhotoImage(master=canvas, image=screenshot)
+            img = ImageTk.PhotoImage(master=canvas,
+                            image=Image.open("boss.jpg").resize((w, h), 
+                            Image.Resampling.BICUBIC))
             canvas.pack(expand=True)
             canvas.create_image(0, 0, image=img, anchor='nw')
             self.boss_window.bind("<Key-b>", self.boss_key)
-            # Ensure the game is paused when the boss window is opened
             if not self.paused:
                 self.pause(key)
             self.boss_window.mainloop()
@@ -356,26 +349,23 @@ class Game(Canvas):
             self.boss_window.destroy()
 
     def game_over(self):
-        """
-        Creates and draws all the buttons and labels for the game over screen.
-        """
         game_over_label = Label(
-            self, text="Game Over", font=self.heading_font,
+            self, text="Game Over", font=self.heading_font, 
             bg=self.background_color, fg='black')
         self.create_window(self.width / 2, self.height / 2 - 30,
                            anchor='center', window=game_over_label)
         lead_button = Button(self, text="Leaderboard",
-                             command=leaderboard,
+                             command=leaderboard, 
                              highlightbackground='#f0d7a1')
         self.create_window(self.width / 2, self.height / 2,
                            anchor='center', window=lead_button)
         save_score = Button(self, text="Save Score to Leaderboard",
-                            command=self.save_score,
+                            command=self.save_score, 
                             highlightbackground='#f0d7a1')
         self.create_window(self.width / 2, self.height / 2 + 30,
                            anchor='center', window=save_score)
         restart = Button(
-            self, text="Exit", command=self.window.destroy,
+            self, text="Exit", command=self.window.destroy, 
             highlightbackground='#f0d7a1')
         self.create_window(self.width / 2, self.height / 2 + 60,
                            anchor='center', window=restart)
@@ -383,29 +373,19 @@ class Game(Canvas):
         self.game_ended = True
 
     def save_score(self):
-        """
-        Asks the user for a name and saves information to the
-        leaderboard.csv file
-        """
-        username = simpledialog.askstring("Save your Score",
+        username = simpledialog.askstring("Save your Score", 
                                           "Username:")
         with open("leaderboard.csv", 'a') as f:
-            f.write(
-                f"{username.lower()}, {int(self.score)}, {self.cheated}\n"
-                )
+            f.write(f"{username.lower()}, {int(self.score)}, {self.cheated}\n")
 
 
 def interval(streak):
-    """
-    A function which defines the interval from streak (player performance)
-    """
     if streak == 0:
         interval = 2000
     elif streak == 1:
         interval = 1500
     elif streak == 2:
-        interval = 1250
+        interval = 1000
     else:
-        # Uses an exponential decay function
-        interval = 1250 * 2.72**(-0.02 * (streak - 3))
+        interval = 1000 * 2.72**(-0.02 * (streak - 3))
     return int(interval)

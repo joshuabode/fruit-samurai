@@ -1,1 +1,1 @@
-{'pause': 'u', 'boss': 'b'}
+{'pause': 'p', 'boss': 'b'}
