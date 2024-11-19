@@ -12,7 +12,7 @@ class Bomb:
         """
         Saves input variables as properties and adds the bomb to canvas
         """
-        self.grounded = False
+        # Initialise the object
         self.canvas = canvas
         self.height, self.width = canvas.height, canvas.width
         self.x, self.y = coords
@@ -24,12 +24,16 @@ class Bomb:
         self.image = ImageTk.PhotoImage(master=self.canvas, image=self.sprite)
         self.object = canvas.create_image(
             self.x, self.y, image=self.image, anchor='center')
+        # Initialise hitbox
         self.bbox = self.canvas.bbox(self.object)
+        # self.grounded tells us if the object is currently colliding 
+        # with the ground
+        self.grounded = False  
         self.deleted = False
         # Save the bomb to the game object so it can be retrieved from a save
         # file
         self.canvas.bombs.append(self)
-        self.tick()                         # Start the loop to move the bomb
+        self.tick()  # Start the loop to move the bomb
 
     def delete(self, _):
         """
