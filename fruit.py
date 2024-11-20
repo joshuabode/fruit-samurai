@@ -8,6 +8,10 @@ from PIL import ImageTk, Image
 
 
 class Fruit:
+    """
+    Handles the initialization, rendering, physics calculations,
+    and game interactions for a fruit object in the game.
+    """
     def __init__(
             self, sprite_coords, coords, velocity, canvas, flip_image=False):
         """
@@ -42,7 +46,7 @@ class Fruit:
         self.deleted = False
         self.tick()
 
-    def delete(self, event):
+    def delete(self, _):
         """
         Removes the base fruit from canvas and stops tracking it for the save
         file. Spawns two chopped fruit halves and alters the game variables

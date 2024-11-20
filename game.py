@@ -11,11 +11,15 @@ from random import randint, choice, uniform
 from collections import deque
 from fruit import Fruit
 from bomb import Bomb
-from leaderboard import leaderboard
+from leaderboard import show_leaderboard
 import pickle
 
 
 class Game(Canvas):
+    """
+    Inherits from Tkinter Canvas and holds all the game logic,
+    variables and rendering
+    """
     def __init__(self, window, w, h, lives=5, score=0, streak=0,
                  hit_or_miss=None):
         """
@@ -303,7 +307,7 @@ class Game(Canvas):
                 self.width / 2, self.height / 2 + 30, anchor='center',
                 window=self.resume_button)
             self.lead_button = Button(
-                self, text="Leaderboard", command=leaderboard,
+                self, text="Leaderboard", command=show_leaderboard,
                 highlightbackground='#f0d7a1')
             self.lead_window = self.create_window(
                 self.width / 2, self.height / 2 + 60, anchor='center',
@@ -365,7 +369,7 @@ class Game(Canvas):
         self.create_window(self.width / 2, self.height / 2 - 30,
                            anchor='center', window=game_over_label)
         lead_button = Button(self, text="Leaderboard",
-                             command=leaderboard,
+                             command=show_leaderboard,
                              highlightbackground='#f0d7a1')
         self.create_window(self.width / 2, self.height / 2,
                            anchor='center', window=lead_button)

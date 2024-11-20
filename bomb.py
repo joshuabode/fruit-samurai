@@ -8,6 +8,10 @@ from PIL import Image, ImageTk
 
 
 class Bomb:
+    """
+    Handles the initialization, rendering, physics calculations,
+    and game interactions for a bomb object in the game.
+    """
     def __init__(self, coords, velocity, canvas):
         """
         Saves input variables as properties and adds the bomb to canvas
@@ -26,9 +30,9 @@ class Bomb:
             self.x, self.y, image=self.image, anchor='center')
         # Initialise hitbox
         self.bbox = self.canvas.bbox(self.object)
-        # self.grounded tells us if the object is currently colliding 
+        # self.grounded tells us if the object is currently colliding
         # with the ground
-        self.grounded = False  
+        self.grounded = False
         self.deleted = False
         # Save the bomb to the game object so it can be retrieved from a save
         # file
@@ -83,6 +87,7 @@ class Bomb:
         # Delete the bomb if it exits the game screen
         if top >= self.height:
             self.deleted = True
+            self.canvas.bombs.remove(self)
             self.canvas.delete(self.object)
         # Update vertical velocity based on acceleration
         if not (self.grounded and self.canvas.floor_cheat):
