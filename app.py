@@ -90,7 +90,7 @@ class App():
             # to the Game generator
             self.main_game = Game(game_window, w, h, *game_data[:-3])
 
-            # game_data[-3] is the list of chopped-fruit data from the game data
+            # game_data[-3] is the list of ChoppedFruit data from the game data
             for slice in game_data[-3]:
                 slice[3] = self.main_game
                 self.main_game.old_slice(slice)
