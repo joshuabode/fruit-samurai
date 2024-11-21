@@ -6,7 +6,7 @@ Defines the App object
 
 import pickle
 from random import randint
-from tkinter import *
+from tkinter import Tk, Toplevel, Label, Button, StringVar
 from tkinter import ttk, font, messagebox, filedialog
 from PIL import ImageTk, Image
 from game import Game
@@ -114,10 +114,13 @@ class App():
         if n == 0:
             command()
         else:
-            label = Label(self.main_game, text=str(n), font=('ArcadeClassic', 144), background=self.main_game.background_color)
-            self.countdown_window = self.main_game.create_window(self.main_game.width/2, self.main_game.height/2, anchor="center", window=label)
+            label = Label(self.main_game, text=str(n), font=(
+                'ArcadeClassic', 144),
+                background=self.main_game.background_color)
+            self.countdown_window = self.main_game.create_window(
+                self.main_game.width/2, self.main_game.height/2,
+                anchor="center", window=label)
             self.main_game.after(1000, lambda: self.countdown(n-1, command))
-
 
     def settings(self):
         """
