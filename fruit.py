@@ -171,6 +171,10 @@ class ChoppedFruit(Fruit):
         super().__init__(sprite_coords, coords, velocity, canvas, flip_image)
 
     def delete(self, _):
+        # If the fruit slice is on the ground when it is sliced again,
+        # delete it. This prevents fruit slices from piling up when floor
+        # cheat is used. Otherwise, if the mouse hovers over a fruit slice,
+        # do nothing
         if self.grounded:
             self.deleted = True
             self.canvas.fruits.remove(self)
