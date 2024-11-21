@@ -21,7 +21,8 @@ class Game(Canvas):
     variables and rendering
     """
     def __init__(self, window, w, h, lives=5, score=0, streak=0,
-                 hit_or_miss=None):
+                 hit_or_miss=None, cheated=False, floor_cheat=False, 
+                 g=9.81, fruit_size=60):
         """
         Initialise game variables and initialise the canvas windows
         for variables lives, streak and score
@@ -47,17 +48,17 @@ class Game(Canvas):
         self.e = 0.3
         self.sprite_sheet = Image.open("Fruit+.png")
         # g: acceleration due to gravity in metres per second.
-        self.g = 9.81
+        self.g = g
         self.width, self.height = w, h
         # Fruit diameter in pixels i.e. the width and height of the images.
-        self.fruit_size = 60
+        self.fruit_size = fruit_size
         # These lists are used to track the objects on the game canvas
         # and are then pickled into the save files.
         self.fruits = []
         self.bombs = []
         # Boolean values for game states
-        self.floor_cheat = False
-        self.cheated = False
+        self.floor_cheat = floor_cheat
+        self.cheated = cheated
         self.paused = False
         self.boss_keyed = False
         self.game_ended = False
@@ -261,22 +262,27 @@ class Game(Canvas):
         if ''.join(self.key_history) == 'LeftRightLeftRightLeftRightDownDown':
             self.floor_cheat = not self.floor_cheat
             self.cheated = True
+            self.key_history.clear()
         # This cheatcode reduces gravity and scales down velocity to reduce
         # the number of fruits bouncing off of the ceiling
-        elif 'LeftUpRightUpUpUp' in ''.join(self.key_history):
+        elif ''.join(self.key_history)[-17:] == 'LeftUpRightUpUpUp':
             self.g = 1
             self.cheated = True
+            self.key_history.clear()
         # This cheat reduces the size of the fruits
-        elif 'DownDownDown' in ''.join(self.key_history):
+        elif ''.join(self.key_history)[-12:] == 'DownDownDown':
             self.fruit_size = 30
             self.cheated = True
+            self.key_history.clear()
         # This cheat increases the size of the fruits
-        elif 'UpUpUpUpUp' in ''.join(self.key_history):
+        elif ''.join(self.key_history)[-10:] == 'UpUpUpUpUp':
             self.fruit_size = 90
             self.cheated = True
+            self.key_history.clear()
         # Bonus life cheat
-        elif 'UpLeftUpUp' in ''.join(self.key_history):
+        elif ''.join(self.key_history)[-10:] == 'UpLeftUpUp':
             self.lives += 1
+            self.key_history.clear()
 
     def pause(self, key):
         """
@@ -324,7 +330,8 @@ class Game(Canvas):
         Saves the game by pickling a list of variables including fruit
         and bomb data
         """
-        vars = (self.lives, self.score, self.streak, list(self.hit_or_miss),
+        vars = (self.lives, self.score, self.streak, list(self.hit_or_miss), 
+                self.floor_cheat, self.g, self.fruit_size, self.cheated,
                 [f.pack() for f in self.fruits],
                 [b.pack() for b in self.bombs])
         file = filedialog.asksaveasfile('wb', defaultextension=".sav")

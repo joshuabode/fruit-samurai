@@ -86,12 +86,12 @@ class App():
             # Trim the fruits and bombs from the saved data and pass the rest
             # to the Game generator
             self.main_game = Game(game_window, w, h, *game_data[:-2])
-            # game_data[4] is the list of fruit data from the game data
-            for fruit in game_data[4]:
+            # game_data[-2] is the list of fruit data from the game data
+            for fruit in game_data[-2]:
                 fruit[3] = self.main_game
                 self.main_game.old_fruit(fruit)
-            # game_data[5] is the list of bomb data from the game data
-            for bomb in game_data[5]:
+            # game_data[-1] is the list of bomb data from the game data
+            for bomb in game_data[-1]:
                 bomb[2] = self.main_game
                 self.main_game.old_bomb(bomb)
             # Restart the spawn loops for fruits and bombs
