@@ -20,8 +20,9 @@ class Game(Canvas):
     Inherits from Tkinter Canvas and holds all the game logic,
     variables and rendering
     """
+
     def __init__(self, window, w, h, lives=5, score=0, streak=0,
-                 hit_or_miss=None, cheated=False, floor_cheat=False, 
+                 hit_or_miss=None, cheated=False, floor_cheat=False,
                  g=9.81, fruit_size=60):
         """
         Initialise game variables and initialise the canvas windows
@@ -330,7 +331,7 @@ class Game(Canvas):
         Saves the game by pickling a list of variables including fruit
         and bomb data
         """
-        vars = (self.lives, self.score, self.streak, list(self.hit_or_miss), 
+        vars = (self.lives, self.score, self.streak, list(self.hit_or_miss),
                 self.floor_cheat, self.g, self.fruit_size, self.cheated,
                 [f.pack() for f in self.fruits],
                 [b.pack() for b in self.bombs])
@@ -403,7 +404,7 @@ class Game(Canvas):
         with open("leaderboard.csv", 'a') as f:
             f.write(
                 f"{username.lower()}, {int(self.score)}, {self.cheated}\n"
-                )
+            )
 
 
 def interval(streak):
