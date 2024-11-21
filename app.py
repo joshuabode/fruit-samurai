@@ -28,6 +28,8 @@ class App():
             family="TkHeadingFont", size=36, weight='bold')
         start_window.title("Fruit Samurai")
         self.menu = start_window
+        # Holds the ID for the starting countdown screen
+        self.countdown_window = None
         self.init_menu()
 
     def init_menu(self):
@@ -73,14 +75,15 @@ class App():
 
     def new_game(self, game_data=None):
         """
-        Initialises a game/canvas objects or loads a game from data
+        Initialises a game/canvas objects or loadsƒ a game from data
         """
         game_window = Toplevel()
         game_window.title("Fruit Samurai")
         w, h = 960, 540
         if not game_data:
             self.main_game = Game(game_window, w, h)
-            self.main_game.new_fruit()
+            # Spawn a new fruit after a 3 second delay with GUI countdown
+            self.countdown(3, self.main_game.new_fruit)
             self.main_game.new_bomb()
         else:    # This block is executed when a game is loaded
             # Trim the fruits and bombs from the saved data and pass the rest
@@ -105,6 +108,16 @@ class App():
         self.main_game.pack()
         self.game_window = game_window
         game_window.mainloop()
+
+    def countdown(self, n, command):
+        self.main_game.delete(self.countdown_window)
+        if n == 0:
+            command()
+        else:
+            label = Label(self.main_game, text=str(n), font=('ArcadeClassic', 144), background=self.main_game.background_color)
+            self.countdown_window = self.main_game.create_window(self.main_game.width/2, self.main_game.height/2, anchor="center", window=label)
+            self.main_game.after(1000, lambda: self.countdown(n-1, command))
+
 
     def settings(self):
         """
