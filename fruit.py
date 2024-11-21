@@ -77,8 +77,8 @@ class Fruit:
                                   0.2 * self.canvas.m_vel[1]),
                                  self.canvas, True)
             # Start tracking the chopped halves in case of game save
-            self.canvas.fruits.append(left)
-            self.canvas.fruits.append(right)
+            self.canvas.slices.append(left)
+            self.canvas.slices.append(right)
             self.canvas.tag_bind(left.object, "<Enter>", left.delete)
             self.canvas.tag_bind(right.object, "<Enter>", right.delete)
             # Removes the old sprite from the canvas
@@ -122,10 +122,11 @@ class Fruit:
                 if not self.canvas.game_ended:
                     self.canvas.configure(bg="red")
                     self.canvas.after(
-                        250, lambda: self.canvas.configure(bg="#f0d7a1")
-                    )
+                        250, lambda: self.canvas.configure(bg="#f0d7a1"))
+                self.canvas.fruits.remove(self)
+            else:  # Remove the object from the slices list if its not a Fruit
+                self.canvas.slices.remove(self)
             self.deleted = True
-            self.canvas.fruits.remove(self)
         # Update vertical velocity based on acceleration
         if not (self.grounded and self.canvas.floor_cheat):
             self.velocity_y += self.canvas.g * self.canvas.ppm * self.canvas.dt
@@ -177,5 +178,5 @@ class ChoppedFruit(Fruit):
         # do nothing
         if self.grounded:
             self.deleted = True
-            self.canvas.fruits.remove(self)
+            self.canvas.slices.remove(self)
             self.canvas.delete(self.object)

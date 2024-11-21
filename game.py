@@ -9,7 +9,7 @@ from tkinter import font, filedialog, simpledialog
 from PIL import ImageTk, Image
 from random import randint, choice, uniform
 from collections import deque
-from fruit import Fruit
+from fruit import Fruit, ChoppedFruit
 from bomb import Bomb
 from leaderboard import show_leaderboard
 import pickle
@@ -22,8 +22,8 @@ class Game(Canvas):
     """
 
     def __init__(self, window, w, h, lives=5, score=0, streak=0,
-                 hit_or_miss=None, cheated=False, floor_cheat=False,
-                 g=9.81, fruit_size=60):
+                 hit_or_miss=None, floor_cheat=False,
+                 g=9.81, fruit_size=60, cheated=False):
         """
         Initialise game variables and initialise the canvas windows
         for variables lives, streak and score
@@ -56,6 +56,7 @@ class Game(Canvas):
         # These lists are used to track the objects on the game canvas
         # and are then pickled into the save files.
         self.fruits = []
+        self.slices = []
         self.bombs = []
         # Boolean values for game states
         self.floor_cheat = floor_cheat
@@ -212,6 +213,15 @@ class Game(Canvas):
         self.fruits.append(fruit)
         self.tag_bind(fruit.object, "<Enter>", fruit.delete)
 
+    def old_slice(self, args):
+        """
+        Creates a slice of fruit with data from a save file
+        """
+        slice = ChoppedFruit(*args)
+        # Start tracking the old slice again
+        self.slices.append(slice)
+        self.tag_bind(slice.object, "<Enter>", slice.delete)
+
     def old_bomb(self, args):
         """
         Creates a bomb with data from a save file
@@ -333,6 +343,7 @@ class Game(Canvas):
         """
         vars = (self.lives, self.score, self.streak, list(self.hit_or_miss),
                 self.floor_cheat, self.g, self.fruit_size, self.cheated,
+                [s.pack() for s in self.slices],
                 [f.pack() for f in self.fruits],
                 [b.pack() for b in self.bombs])
         file = filedialog.asksaveasfile('wb', defaultextension=".sav")

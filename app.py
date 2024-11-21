@@ -88,7 +88,12 @@ class App():
         else:    # This block is executed when a game is loaded
             # Trim the fruits and bombs from the saved data and pass the rest
             # to the Game generator
-            self.main_game = Game(game_window, w, h, *game_data[:-2])
+            self.main_game = Game(game_window, w, h, *game_data[:-3])
+
+            # game_data[-3] is the list of chopped-fruit data from the game data
+            for slice in game_data[-3]:
+                slice[3] = self.main_game
+                self.main_game.old_slice(slice)
             # game_data[-2] is the list of fruit data from the game data
             for fruit in game_data[-2]:
                 fruit[3] = self.main_game
