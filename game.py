@@ -293,6 +293,7 @@ class Game(Canvas):
         # Bonus life cheat
         elif ''.join(self.key_history)[-10:] == 'UpLeftUpUp':
             self.lives += 1
+            self.cheated = True
             self.key_history.clear()
 
     def pause(self, key):
