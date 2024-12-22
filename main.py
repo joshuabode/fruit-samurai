@@ -1,5 +1,5 @@
 """
-GAME_SOLUTION.PY
+MAIN.PY
 
 The driver code for the app
 Developer: Joshua Bode

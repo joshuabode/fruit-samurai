@@ -4,7 +4,7 @@
 
 ## Installation
 
-Download all files into one folder and run app.py. You may need to run `pip install -r requirements.txt` to ensure you have the required version of Pillow.
+Download all files into one folder and run `main.py`. You may need to run `pip install -r requirements.txt` to ensure you have the required version of Pillow.
 
 For full immersion, installation of the `arcade.ttf` font is recommended.
 
