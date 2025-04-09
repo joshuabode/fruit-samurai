@@ -38,12 +38,12 @@ class App():
         """
         root = self.menu
         img = ImageTk.PhotoImage(image=Image.open(
-            'kitchen.png').resize((400, 400), Image.Resampling.NEAREST))
+            'assets/kitchen.png').resize((400, 400), Image.Resampling.NEAREST))
         image_label = Label(master=root, image=img,
                             highlightthickness=0, borderwidth=0)
         image_label.place(x=0, y=200)
         title = Label(root, text="Fruit Samurai",
-                      font=self.heading_font, bg="#caaeba", fg='black')
+                      font=self.heading_font, bg="#caaeba", fg='white')
         # Generate the buttons
         buttons = [
             Button(root, text="New Game", command=self.new_game,
@@ -60,7 +60,7 @@ class App():
                    highlightbackground='#caaeba')
         ]
 
-        title.grid(column=0, row=0, padx=100)
+        title.grid(column=0, row=0, padx=50)
         # Display the buttons
         for i, button in enumerate(buttons):
             button.grid(column=0, row=i+1)
@@ -121,7 +121,8 @@ class App():
         else:
             label = Label(self.main_game, text=str(n), font=(
                 'ArcadeClassic', 144),
-                background=self.main_game.background_color)
+                background=self.main_game.background_color,
+                foreground="black")
             self.countdown_window = self.main_game.create_window(
                 self.main_game.width/2, self.main_game.height/2,
                 anchor="center", window=label)

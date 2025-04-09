@@ -47,7 +47,7 @@ class Game(Canvas):
         # used in Newton's Law of Restitution used to find the velocity
         # after a collision.
         self.e = 0.3
-        self.sprite_sheet = Image.open("Fruit+.png")
+        self.sprite_sheet = Image.open("assets/Fruit+.png")
         # g: acceleration due to gravity in metres per second.
         self.g = g
         self.width, self.height = w, h
@@ -366,7 +366,7 @@ class Game(Canvas):
             canvas = Canvas(self.boss_window,
                             width=w,
                             height=h)
-            screenshot = Image.open("boss.jpg")
+            screenshot = Image.open("assets/boss.jpg")
             screenshot = screenshot.resize((w, h), Image.Resampling.BICUBIC)
             img = ImageTk.PhotoImage(master=canvas, image=screenshot)
             canvas.pack(expand=True)

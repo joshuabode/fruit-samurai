@@ -21,7 +21,7 @@ class Bomb:
         self.height, self.width = canvas.height, canvas.width
         self.x, self.y = coords
         self.velocity_x, self.velocity_y = velocity
-        self.sprite = Image.open("bomb.png")
+        self.sprite = Image.open("assets/bomb.png")
         self.sprite = self.sprite.resize((int(self.canvas.fruit_size),
                                           int(self.canvas.fruit_size)),
                                          Image.Resampling.NEAREST)
