@@ -1,4 +1,4 @@
-Move the cursor over the fruit objects to slice them. 
+Move the cursor over the fruit objects to slice them.
 The quicker you swipe through the fruit, the more points you get!
 Golden apples will give you an extra life.
 Slicing the bombs loses you a life.

@@ -6,9 +6,12 @@ Loads data from the csv file and parses it  into tkinter labels, filtering
 out cheaters
 """
 
+import os
 from tkinter import Toplevel, Label
 from tkinter import font
 
+PROJECT_DIR = os.path.join(os.path.dirname(__file__), "..")
+leaderboard_path = os.path.join(PROJECT_DIR, "data", "leaderboard.csv")
 
 def show_leaderboard():
     """
@@ -17,7 +20,7 @@ def show_leaderboard():
     leaderboard = Toplevel()
     heading_font = font.Font(family="ArcadeClassic", size=36)
     retro_font = font.Font(family="ArcadeClassic", size=20)
-    with open("leaderboard.csv", 'r', encoding='utf-8') as f:
+    with open(leaderboard_path, 'r', encoding='utf-8') as f:
         scorelist = f.readlines()[1:]       # Trims the csv header row
 
     # Parses the csv data to a list and converts the score values to integers

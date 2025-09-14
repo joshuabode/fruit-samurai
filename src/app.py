@@ -4,6 +4,7 @@ APP.PY
 Defines the App object
 """
 
+import os
 import pickle
 from random import randint
 from tkinter import Tk, Toplevel, Label, Button, StringVar
@@ -13,7 +14,10 @@ from game import Game
 from leaderboard import show_leaderboard
 
 
-class App():
+LOWERCASE_LETTERS = [chr(i) for i in range(ord("a"), ord("z")+1)]
+PROJECT_DIR = os.path.join(os.path.dirname(__file__), "..")
+
+class App:
 
     def __init__(self):
         """
@@ -30,6 +34,9 @@ class App():
         self.menu = start_window
         # Holds the ID for the starting countdown screen
         self.countdown_window = None
+        self.controls_path = os.path.join(PROJECT_DIR, "data", "controls.txt")
+        self.tutorial_path = os.path.join(PROJECT_DIR, "data", "tutorial.txt")
+        self.kitchen_path = os.path.join(PROJECT_DIR, "assets", "kitchen.png")
         self.init_menu()
 
     def init_menu(self):
@@ -38,7 +45,7 @@ class App():
         """
         root = self.menu
         img = ImageTk.PhotoImage(image=Image.open(
-            'assets/kitchen.png').resize((400, 400), Image.Resampling.NEAREST))
+            self.kitchen_path).resize((400, 400), Image.Resampling.NEAREST))
         image_label = Label(master=root, image=img,
                             highlightthickness=0, borderwidth=0)
         image_label.place(x=0, y=200)
@@ -132,7 +139,7 @@ class App():
         """
         Initialises the settings window
         """
-        with open('controls.txt', 'r') as file:
+        with open(self.controls_path, 'r') as file:
             # Since the contents of the controls file is a string
             # representation of a dict, we can just unpack with eval
             self.controls = eval(file.read())
@@ -149,10 +156,7 @@ class App():
         self.pause_sel = ttk.Combobox(
             settings_window, textvariable=pause_var, width=2)
         pause_lab = Label(settings_window, text="Pause Keybind:")
-        self.pause_sel['values'] = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-                                    'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
-                                    'q', 's', 't', 'u', 'v', 'w', 'x', 'y',
-                                    'z')
+        self.pause_sel['values'] = LOWERCASE_LETTERS
         pause_lab.grid(column=0, row=1)
         self.pause_sel.grid(column=1, row=1)
 
@@ -160,9 +164,7 @@ class App():
         self.boss_sel = ttk.Combobox(
             settings_window, textvariable=boss_var, width=2)
         boss_lab = Label(settings_window, text="Boss Keybind:")
-        self.boss_sel['values'] = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-                                   'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
-                                   'q', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z')
+        self.boss_sel['values'] = LOWERCASE_LETTERS
         boss_lab.grid(column=0, row=2)
         self.boss_sel.grid(column=1, row=2)
 
@@ -184,7 +186,7 @@ class App():
         boss = self.boss_sel.get()
         if pause != boss:
             self.controls = {'pause': pause, 'boss': boss}
-            with open('controls.txt', 'w') as file:
+            with open(self.controls_path, 'w') as file:
                 file.write(str(self.controls))
             self.settings_window.destroy()
         else:
@@ -193,13 +195,13 @@ class App():
 
     def tutorial(self):
         """
-        Shows text instructions from the tutorial.txt file
+        Shows text instructions from the ../data/tutorial.txt file
         """
         tutorial = Toplevel()
         tutorial.geometry("600x200")
         title = Label(tutorial, text="How to Play", font=self.heading_font)
         title.pack()
-        with open("tutorial.txt", 'r') as f:
+        with open(self.tutorial_path, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 label = Label(tutorial, text=line)

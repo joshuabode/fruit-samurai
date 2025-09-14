@@ -4,6 +4,7 @@ GAME.PY
 Defines the Game object which inherits from Tkinter Canvas.
 """
 
+import os
 from tkinter import Toplevel, Label, Button, Canvas
 from tkinter import font, filedialog, simpledialog
 from PIL import ImageTk, Image
@@ -14,6 +15,7 @@ from bomb import Bomb
 from leaderboard import show_leaderboard
 import pickle
 
+PROJECT_DIR = os.path.join(os.path.dirname(__file__), "..")
 
 class Game(Canvas):
     """
@@ -28,6 +30,10 @@ class Game(Canvas):
         Initialise game variables and initialise the canvas windows
         for variables lives, streak and score
         """
+        self.controls_path = os.path.join(PROJECT_DIR, "data", "controls.txt")
+        self.leaderboard_path = os.path.join(PROJECT_DIR, "data", "leaderboard.csv")
+        self.sprite_sheet_path = os.path.join(PROJECT_DIR, "assets", "Fruit+.png")
+        self.boss_screen_path = os.path.join(PROJECT_DIR, "assets", "boss.png")
         self.background_color = "#f0d7a1"
         self.mouse_trail_color = "#eddfc5"
         self.retro_font = font.Font(family="ArcadeClassic", size=20)
@@ -47,7 +53,7 @@ class Game(Canvas):
         # used in Newton's Law of Restitution used to find the velocity
         # after a collision.
         self.e = 0.3
-        self.sprite_sheet = Image.open("assets/Fruit+.png")
+        self.sprite_sheet = Image.open(self.sprite_sheet_path)
         # g: acceleration due to gravity in metres per second.
         self.g = g
         self.width, self.height = w, h
@@ -100,7 +106,7 @@ class Game(Canvas):
         self.heading_font = font.Font(
             family='TkHeadingFont', size=36, weight='bold')
         # Set the game controls to match those on the file
-        with open('controls.txt', 'r') as file:
+        with open(self.controls_path, 'r') as file:
             self.controls = eval(file.read())
         # Start the update loop
         self.update()
@@ -151,9 +157,9 @@ class Game(Canvas):
         different commands.
         """
         self.check_cheat(key)
-        if key.char == self.controls['pause']:
+        if key.char.lower() == self.controls['pause']:
             self.pause(key)
-        elif key.char == self.controls['boss']:
+        elif key.char.lower() == self.controls['boss']:
             self.boss_key(key)
 
     def new_fruit(self):
@@ -366,7 +372,7 @@ class Game(Canvas):
             canvas = Canvas(self.boss_window,
                             width=w,
                             height=h)
-            screenshot = Image.open("assets/boss.jpg")
+            screenshot = Image.open(self.boss_screen_path)
             screenshot = screenshot.resize((w, h), Image.Resampling.BICUBIC)
             img = ImageTk.PhotoImage(master=canvas, image=screenshot)
             canvas.pack(expand=True)
@@ -409,11 +415,11 @@ class Game(Canvas):
     def save_score(self):
         """
         Asks the user for a name and saves information to the
-        leaderboard.csv file
+        leaderboard data file
         """
         username = simpledialog.askstring("Save your Score",
                                           "Username:")
-        with open("leaderboard.csv", 'a') as f:
+        with open(self.leaderboard_path, 'a') as f:
             f.write(
                 f"{username.lower()}, {int(self.score)}, {self.cheated}\n"
             )
